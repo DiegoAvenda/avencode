@@ -1,0 +1,343 @@
+@import 'tailwindcss';
+@import '@fontsource/share-tech-mono/400.css';
+
+/*
+ * Single source of truth for the app palette (cyberpunk). Tailwind turns each
+ * entry into utilities (bg-cyber-cyan, text-cyber-yellow, border-line, …) so
+ * components never need custom CSS. The lesson starter CSS is course material
+ * and stays plain CSS on purpose — it is what learners read and edit.
+ */
+@theme {
+	/* Palette from the style guide. */
+	--color-cyber-yellow: #fcee0a;
+	--color-cyber-cyan: #00f0ff;
+	--color-cyber-magenta: #ff003c;
+	--color-cyber-bg: #050505;
+	--color-cyber-surface: #121212;
+
+	/* Semantic tokens the components already use, mapped onto the palette. */
+	--color-bg: #050505;
+	--color-surface-1: #121212;
+	--color-surface-2: #1a1a1a;
+	--color-surface-3: #2a2a2a;
+	--color-line: #262626;
+	--color-ink: #e5e7eb;
+	--color-muted: #9ca3af;
+	--color-accent: #00f0ff;
+
+	--font-mono: 'Share Tech Mono', ui-monospace, monospace;
+	--font-sans: 'Share Tech Mono', ui-monospace, monospace;
+
+	--shadow-neon-cyan: 0 0 10px #00f0ff, 0 0 20px rgba(0, 240, 255, 0.3);
+	--shadow-neon-magenta: 0 0 10px #ff003c, 0 0 20px rgba(255, 0, 60, 0.3);
+	--shadow-neon-yellow: 0 0 10px #fcee0a, 0 0 20px rgba(252, 238, 10, 0.3);
+}
+
+body {
+	@apply m-0 bg-cyber-bg font-mono text-ink antialiased;
+	background-image:
+		linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+	background-size: 40px 40px;
+	overflow-x: hidden;
+}
+
+::selection {
+	background: #ff003c;
+	color: #ffffff;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: #050505;
+	border-left: 1px solid #ff003c;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #fcee0a;
+}
+
+/* Glitch effect (guide, section 6). */
+@keyframes glitch-anim {
+	0% {
+		clip: rect(10px, 9999px, 80px, 0);
+		transform: translate(0);
+	}
+	20% {
+		clip: rect(40px, 9999px, 20px, 0);
+		transform: translate(-3px, 3px);
+	}
+	40% {
+		clip: rect(80px, 9999px, 50px, 0);
+		transform: translate(3px, -3px);
+	}
+	60% {
+		clip: rect(30px, 9999px, 90px, 0);
+		transform: translate(-3px, 3px);
+	}
+	80% {
+		clip: rect(60px, 9999px, 20px, 0);
+		transform: translate(3px, 3px);
+	}
+	100% {
+		clip: rect(20px, 9999px, 70px, 0);
+		transform: translate(0);
+	}
+}
+
+@keyframes glitch-anim-2 {
+	0% {
+		clip: rect(65px, 9999px, 100px, 0);
+		transform: translate(0);
+	}
+	20% {
+		clip: rect(25px, 9999px, 45px, 0);
+		transform: translate(3px, -3px);
+	}
+	40% {
+		clip: rect(75px, 9999px, 15px, 0);
+		transform: translate(-3px, 3px);
+	}
+	60% {
+		clip: rect(15px, 9999px, 85px, 0);
+		transform: translate(-3px, 3px);
+	}
+	80% {
+		clip: rect(85px, 9999px, 35px, 0);
+		transform: translate(3px, -3px);
+	}
+	100% {
+		clip: rect(45px, 9999px, 65px, 0);
+		transform: translate(0);
+	}
+}
+
+/*
+ * Custom classes from the style guide. They live here (and only here) because
+ * they are clip paths, overlays and animations, which utilities cannot express.
+ */
+@layer components {
+	.clip-card {
+		clip-path: polygon(
+			0 0,
+			calc(100% - 30px) 0,
+			100% 30px,
+			100% 100%,
+			30px 100%,
+			0 calc(100% - 30px)
+		);
+	}
+
+	.clip-button {
+		clip-path: polygon(
+			0 0,
+			calc(100% - 15px) 0,
+			100% 15px,
+			100% 100%,
+			15px 100%,
+			0 calc(100% - 15px)
+		);
+	}
+
+	.clip-image {
+		clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+	}
+
+	.scanline-bg {
+		background: linear-gradient(
+			to bottom,
+			rgba(255, 255, 255, 0),
+			rgba(255, 255, 255, 0) 50%,
+			rgba(0, 0, 0, 0.2) 50%,
+			rgba(0, 0, 0, 0.2)
+		);
+		background-size: 100% 4px;
+	}
+
+	.glitch-wrapper {
+		position: relative;
+	}
+
+	.glitch {
+		position: relative;
+		color: #ffffff;
+		z-index: 1;
+	}
+
+	.glitch::before,
+	.glitch::after {
+		content: attr(data-text);
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: #050505;
+	}
+
+	.glitch::before {
+		left: 3px;
+		text-shadow: -2px 0 #ff003c;
+		clip: rect(24px, 550px, 90px, 0);
+		animation: glitch-anim-2 3s infinite linear alternate-reverse;
+		z-index: -1;
+	}
+
+	.glitch::after {
+		left: -3px;
+		text-shadow: -2px 0 #00f0ff;
+		clip: rect(85px, 550px, 140px, 0);
+		animation: glitch-anim 2.5s infinite linear alternate-reverse;
+		z-index: -2;
+	}
+
+	/*
+	 * Lab workspace. The column widths are runtime numbers, so they travel in an
+	 * inline style; what cannot be a utility lives here: the dvh fallback for the
+	 * app shell, the separator affordance and the vertical focus-strip label.
+	 */
+	.lab-viewport {
+		height: 100vh;
+		height: 100dvh;
+	}
+
+	.lab-splitter {
+		position: relative;
+		touch-action: none;
+		background: transparent;
+	}
+
+	.lab-splitter[data-orientation='vertical'] {
+		cursor: col-resize;
+		width: 6px;
+	}
+
+	.lab-splitter[data-orientation='horizontal'] {
+		cursor: row-resize;
+		height: 6px;
+		flex: 0 0 6px;
+	}
+
+	.lab-splitter::after {
+		content: '';
+		position: absolute;
+		background: var(--color-line);
+		transition:
+			background 150ms ease,
+			width 150ms ease,
+			height 150ms ease;
+	}
+
+	.lab-splitter[data-orientation='vertical']::after {
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: 1px;
+		transform: translateX(-50%);
+	}
+
+	.lab-splitter[data-orientation='horizontal']::after {
+		left: 0;
+		right: 0;
+		top: 50%;
+		height: 1px;
+		transform: translateY(-50%);
+	}
+
+	.lab-splitter:hover::after,
+	.lab-splitter:focus-visible::after,
+	.lab-splitter[data-dragging='true']::after {
+		background: var(--color-cyber-cyan);
+	}
+
+	.lab-splitter[data-orientation='vertical']:hover::after,
+	.lab-splitter[data-orientation='vertical']:focus-visible::after,
+	.lab-splitter[data-orientation='vertical'][data-dragging='true']::after {
+		width: 2px;
+	}
+
+	.lab-splitter[data-orientation='horizontal']:hover::after,
+	.lab-splitter[data-orientation='horizontal']:focus-visible::after,
+	.lab-splitter[data-orientation='horizontal'][data-dragging='true']::after {
+		height: 2px;
+	}
+
+	.lab-splitter:focus-visible {
+		outline: 2px solid var(--color-cyber-cyan);
+		outline-offset: -2px;
+	}
+
+	.lab-strip-label {
+		writing-mode: vertical-rl;
+	}
+
+	/* Cyan halo that bleeds from the header's line into the lesson strip. */
+	.lab-strip-glow {
+		box-shadow:
+			inset 0 2px 6px -2px color-mix(in srgb, var(--color-cyber-cyan) 60%, transparent),
+			inset 0 4px 12px -3px color-mix(in srgb, var(--color-cyber-cyan) 30%, transparent);
+	}
+
+	/*
+	 * Lesson prose is injected with {@html} from src/lib/markdown.js, so the
+	 * generated tags cannot carry utility classes. The renderer emits these
+	 * semantic names and they are built from the same Tailwind utilities here.
+	 */
+	.md-h3 {
+		@apply mt-4 mb-2 text-base font-semibold tracking-wide text-cyber-cyan uppercase;
+	}
+
+	.md-h4 {
+		@apply mt-3 mb-1.5 text-sm font-semibold tracking-wide text-cyber-yellow uppercase;
+	}
+
+	.md-list {
+		@apply my-2 ml-6 list-disc space-y-1;
+	}
+
+	.md-list .md-list {
+		@apply my-1 ml-5;
+	}
+
+	ol.md-list {
+		@apply list-decimal;
+	}
+
+	.md-li {
+		@apply pl-1;
+	}
+
+	.md-li::marker {
+		color: var(--color-cyber-cyan);
+	}
+
+	.md-table {
+		@apply my-2 w-full border-collapse text-xs;
+	}
+
+	.md-table th,
+	.md-table td {
+		@apply border border-line px-2.5 py-1.5 text-left;
+	}
+
+	.md-table th {
+		@apply bg-surface-2 font-semibold text-cyber-cyan;
+	}
+
+	.md-code-block {
+		@apply my-2 overflow-x-auto border border-line bg-black p-3 font-mono text-[12.5px] leading-relaxed;
+		border-left: 2px solid var(--color-cyber-magenta);
+	}
+
+	.md-code-inline {
+		@apply bg-cyber-cyan/10 px-1.5 py-px font-mono text-[0.9em] text-cyber-cyan;
+	}
+
+	.md-link {
+		@apply text-cyber-yellow underline decoration-dotted underline-offset-2;
+	}
+}

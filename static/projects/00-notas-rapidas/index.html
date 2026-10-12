@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Quick Notes — Reference Solution</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<main class="app">
+		<h1 class="app-title">Quick Notes</h1>
+		<div class="composer">
+			<textarea id="note-input" class="note-input" placeholder="Write a note..."></textarea>
+			<button id="add-btn" class="btn" type="button">Add Note</button>
+		</div>
+		<div class="toolbar">
+			<button id="undo-btn" class="btn" type="button">Undo</button>
+			<p id="status" class="status"></p>
+		</div>
+		<section id="notes" class="notes" aria-label="Notes"></section>
+	</main>
+	<script src="app.js"></script>
+</body>
+</html>
