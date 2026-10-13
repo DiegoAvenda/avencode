@@ -6,13 +6,13 @@
 ## 1. Project overview
 
 Avencode is a 100%-interactive front-end course platform. The shipped course
-is Module 0 ("Quick Notes" notes app, 12 lessons, 4 phases).
+is Module 0 ("Skill Roadmap" prerequisite skill map, 17 lessons, 5 phases).
 
 Two code types — never confuse them:
 
 1. **Platform code** (this repo's SvelteKit app): Svelte 5 runes, Better Auth,
    MongoDB, Google OAuth, Tailwind, CodeMirror editor.
-2. **Learner code** (inside `src/lib/content/notas/curriculum/lesson-*.js`):
+2. **Learner code** (inside `src/lib/content/roadmap/curriculum/lesson-*.js`):
    vanilla JS (ES6+), HTML5, CSS3 only. No frameworks, no bundlers, no Canvas,
    no Svelte. Keep it that way when editing course content.
 
@@ -27,18 +27,19 @@ Two code types — never confuse them:
 - Types: plain JS with JSDoc (`jsconfig.json`, `checkJs: false`). No
   `svelte-check`, no `tsc` script.
 
-| Path | Purpose |
-|---|---|
-| `src/routes/` | `+page.svelte` (landing), `lesson/[id]/` (lab), `better-auth/`, `api/progress/` |
-| `src/lib/content/notas/lessons.js` | Course index: metadata only (`id`, `title`, optional `type`) |
-| `src/lib/content/notas/curriculum/` | Full lesson bodies (`lesson-01.js`…`lesson-12.js`) |
-| `src/lib/playground/` | Sandboxed iframe preview (`buildSrcDoc.js`, `iframeProtocol.js`) |
-| `src/lib/stores/` | `progress.svelte.js`, `progressMigrations.js`, `labLayout.js` |
-| `src/lib/server/` | `auth.js` (Better Auth), `db.js` (MongoDB) |
-| `src/lib/markdown.js` | Dependency-free lesson Markdown renderer |
-| `src/lib/components/` | Lab UI (`Playground`, `CodeEditor`, `Preview`, `Console*`, …) |
-| `tests/` | `node:test` suites, one per area above |
-| `src/hooks.server.js` | Auth session wiring (`app.d.ts` declares `App.Locals`) |
+| Path                                  | Purpose                                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------------- |
+| `src/routes/`                         | `+page.svelte` (landing), `lesson/[id]/` (lab), `better-auth/`, `api/progress/` |
+| `src/lib/content/roadmap/lessons.js`  | Course index: metadata only (`id`, `title`, optional `type`)                    |
+| `src/lib/content/roadmap/curriculum/` | Full lesson bodies (`lesson-01.js`…`lesson-17.js`)                              |
+| `src/lib/content/roadmap/engine.js`   | Tested reference for lesson logic (graph + signals); see §4                     |
+| `src/lib/playground/`                 | Sandboxed iframe preview (`buildSrcDoc.js`, `iframeProtocol.js`)                |
+| `src/lib/stores/`                     | `progress.svelte.js`, `progressMigrations.js`, `labLayout.js`                   |
+| `src/lib/server/`                     | `auth.js` (Better Auth), `db.js` (MongoDB)                                      |
+| `src/lib/markdown.js`                 | Dependency-free lesson Markdown renderer                                        |
+| `src/lib/components/`                 | Lab UI (`Playground`, `CodeEditor`, `Preview`, `Console*`, …)                   |
+| `tests/`                              | `node:test` suites, one per area above                                          |
+| `src/hooks.server.js`                 | Auth session wiring (`app.d.ts` declares `App.Locals`)                          |
 
 ## 3. Commands
 
@@ -84,14 +85,22 @@ Notes:
 - **Course content model:** `lessons.js` exports `modules` (id/label/project/
   stack/from/to), `phases`, `lessonList`, and lazy `loadLesson(id)` importers.
   Each `curriculum/lesson-NN.js` default-exports `{ id, title, description,
-  task, concept, whyItMatters, starterCode: { html, css, javascript },
-  type? }`. Only `type: 'challenge'` exists (lesson 11; its prose must contain
-  "Integrative challenge"). `tests/lessons.test.js` enforces this contract —
+task, concept, whyItMatters, starterCode: { html, css, javascript },
+type? }`. `type: 'challenge'` marks lessons 9 (topological order) and 16
+  (diamond final boss); each challenge's prose must contain
+  "Integrative challenge". `tests/lessons.test.js` enforces this contract —
   read it before adding or renumbering lessons.
+- **Lesson logic reference:** `src/lib/content/roadmap/engine.js` holds the
+  canonical pure implementations of what learners build (derived status,
+  depth, cycle DFS, topological order, progress math, signals/effects/memos,
+  including the documented diamond double-run). `tests/roadmap.test.js` is
+  its executable spec. The end-state runnable reference is
+  `static/projects/00-skill-roadmap/` (classic scripts, same format as the
+  in-lesson starters).
 - **Progress model:** localStorage key `avencode-progress` (versioned,
-  currently v1) is the render source of truth: `{ currentLesson,
-  completedLessons[], editorContents{lessonId: {html,css,javascript}},
-  updatedAt }`. Logged-in learners mirror it to the MongoDB `progress`
+  currently v2) is the render source of truth: `{ currentLesson,
+completedLessons[], editorContents{lessonId: {html,css,javascript}},
+updatedAt }`. Logged-in learners mirror it to the MongoDB `progress`
   collection keyed by `userId` (upsert, 400 KB cap). Every read/write passes
   through `migrateToCurrent`/`sanitizeProgress` — corrupt fields fall back
   per-field, never wipe. Renumbering lessons requires a migration + version
@@ -127,20 +136,20 @@ Observed in the code actually present (Svelte 5 runes forced in
 
 Names only — never print or commit values. Local `.env` is gitignored.
 
-| Name | Purpose (from code) |
-|---|---|
-| `ORIGIN` / `PROD_ORIGIN` | Better Auth `baseURL` (dev / prod) |
-| `BETTER_AUTH_SECRET` | Better Auth signing secret |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth provider |
-| `MONGODB_URI` / `MONGODB_DATABASE` | Mongo driver connection + database |
-| `DATABASE_URL` | Only referenced by `drizzle.config.js` (stale?, see §3) |
-| `GROQ_*`, `R2_*`, `STRIPE_*`, `WHATSAPP_*` | Present in local `.env` but **unused in `src/`** — do not wire up unasked |
+| Name                                        | Purpose (from code)                                                       |
+| ------------------------------------------- | ------------------------------------------------------------------------- |
+| `ORIGIN` / `PROD_ORIGIN`                    | Better Auth `baseURL` (dev / prod)                                        |
+| `BETTER_AUTH_SECRET`                        | Better Auth signing secret                                                |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth provider                                                     |
+| `MONGODB_URI` / `MONGODB_DATABASE`          | Mongo driver connection + database                                        |
+| `DATABASE_URL`                              | Only referenced by `drizzle.config.js` (stale?, see §3)                   |
+| `GROQ_*`, `R2_*`, `STRIPE_*`, `WHATSAPP_*`  | Present in local `.env` but **unused in `src/`** — do not wire up unasked |
 
 ## 7. Testing
 
 - Runner: `node:test` + `node:assert/strict`, no framework. Suites:
   `lessons` (content contract), `markdown`, `playground`, `progress`,
-  `labLayout`. Run: `node --test tests/*.test.js`.
+  `labLayout`, `roadmap` (engine spec). Run: `node --test tests/*.test.js`.
 - Adding a lesson? Update `lessonList` + `loaders` + new `curriculum` file +
   `modules`/`phases` ranges; `MAX_LESSON_ID` must still equal
   `lessonList.length` (asserted). Starter JS must parse via `new Function`;
@@ -148,13 +157,17 @@ Names only — never print or commit values. Local `.env` is gitignored.
   styled; `<title>` and the `//` header must carry
   `<project> — Lesson <id>`; challenge lessons need `type` in both index and
   body.
+- Replacing a curriculum? Bump `STORAGE_VERSION` and map the old era to
+  something safe in `migrateToCurrent` (v1 payloads reset to defaults
+  because their ids reference a deleted curriculum); add tests pinning
+  the old-era, current-version and idempotency behavior.
 - Adding a store field? Extend the sanitiser + migration path and add a
   round-trip/corrupt-payload test in the matching suite.
 
 ## 8. Boundaries
 
 - **Always:** read the file (and its test) before editing; run `node --test
-  tests/*.test.js` plus Prettier/ESLint before finishing; keep learner code
+tests/*.test.js` plus Prettier/ESLint before finishing; keep learner code
   vanilla JS/HTML/CSS (no frameworks, no Canvas); keep secrets out of code,
   logs, and PR text.
 - **Ask first:** auth flow or providers, Mongo schema/collections, new
@@ -175,7 +188,7 @@ Names only — never print or commit values. Local `.env` is gitignored.
 
 ## 10. Definition of done
 
-- [ ] `node --test tests/*.test.js` green (42/42 or more)
+- [ ] `node --test tests/*.test.js` green
 - [ ] Prettier/ESLint status reported (or green); no new warnings
 - [ ] No secrets, no `.env` changes, no learner-code framework leakage
 - [ ] PR on a `feat/*` branch with summary, verification log, risks

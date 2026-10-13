@@ -1,0 +1,117 @@
+/* Skill Roadmap — reference solution styles.
+   Plain CSS on purpose: this file is course material, not app chrome. */
+
+body {
+	background: #f4f6fb;
+	color: #1c2430;
+	font-family: system-ui, sans-serif;
+	margin: 0;
+}
+
+.app {
+	margin: 32px auto;
+	max-width: 640px;
+	padding: 0 16px;
+}
+
+.app-title {
+	font-size: 28px;
+	margin: 0 0 8px;
+}
+
+.section-title {
+	font-size: 18px;
+	margin: 24px 0 8px;
+}
+
+.composer {
+	display: flex;
+	gap: 8px;
+	align-items: flex-start;
+	margin-top: 8px;
+}
+
+.node-input {
+	flex: 1;
+	border: 1px solid #c7d0dd;
+	border-radius: 8px;
+	font: inherit;
+	padding: 8px 12px;
+}
+
+.btn {
+	background: #2563eb;
+	border: none;
+	border-radius: 8px;
+	color: #fff;
+	cursor: pointer;
+	font: inherit;
+	padding: 10px 16px;
+}
+
+.btn:hover {
+	background: #1d4ed8;
+}
+
+.status {
+	color: #5b6572;
+	font-size: 13px;
+}
+
+.counts {
+	color: #5b6572;
+	font-size: 13px;
+}
+
+.roadmap {
+	display: grid;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+.next-list {
+	display: grid;
+	gap: 8px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.next-item {
+	background: #ecfdf3;
+	border: 1px solid #12b76a;
+	border-radius: 8px;
+	padding: 8px 12px;
+}
+
+.node {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	background: #fff;
+	border: 1px solid #e1e7f0;
+	border-radius: 8px;
+	padding: 8px 12px;
+}
+
+.node-title {
+	flex: 1;
+	font-weight: bold;
+	margin: 0;
+}
+
+.node-status {
+	color: #5b6572;
+	font-size: 13px;
+	margin: 0;
+}
+
+.node-done {
+	background: transparent;
+	border: 1px solid #12b76a;
+	border-radius: 8px;
+	color: #027a48;
+	cursor: pointer;
+	font: inherit;
+	padding: 6px 10px;
+}
