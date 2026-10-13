@@ -6,22 +6,31 @@
  * `progress.svelte.js`). Every payload carries a `version` field so lesson
  * renumbering can ship a migration instead of wiping learner work.
  *
- * This curriculum starts at STORAGE_VERSION 1. If lessons are ever
- * renumbered, inserted or moved: add a `shiftProgressToVN` function below,
- * chain it in `migrateToCurrent`, and bump STORAGE_VERSION. Never drop a
- * payload you cannot interpret; keep what is readable.
+ * Version history:
+ * - v1: the previous Module 0 curriculum (12 lessons). Replaced by the
+ *   "Skill Roadmap" curriculum, whose lesson ids mean different lessons, so
+ *   v1 snapshots (including version-less payloads, which predate versioning
+ *   on the server mirror) migrate to fresh defaults: the old progress is
+ *   archived by reset. Nothing is deleted from MongoDB; stale documents are
+ *   overwritten on the owner's next PUT, and reads never surface stale ids.
+ * - v2: Module 0 is "Skill Roadmap" (17 lessons).
+ *
+ * If lessons are ever renumbered, inserted or moved: add a
+ * `shiftProgressToVN` function below, chain it in `migrateToCurrent`, and
+ * bump STORAGE_VERSION. Never drop a payload you cannot interpret; keep
+ * what is readable.
  *
  * Lab layout preferences live in `labLayout.js` under their own key and are
  * never merged into this payload.
  */
 
 export const STORAGE_KEY = 'avencode-progress';
-export const STORAGE_VERSION = 1;
+export const STORAGE_VERSION = 2;
 
 /** Highest lesson id of Module 0. Importing lessons.js here would pull the
  * whole curriculum into server bundles, so the bound is duplicated and
  * asserted by `tests/progress.test.js`. */
-export const MAX_LESSON_ID = 12;
+export const MAX_LESSON_ID = 17;
 
 /**
  * Remap every lesson reference inside a progress payload.
@@ -109,14 +118,21 @@ export function sanitizeProgress(raw) {
 
 /**
  * Bring any stored payload up to the current version, then sanitise it.
+ * Pure and idempotent: migrating twice changes nothing the second time.
  * @param {unknown} raw
  */
 export function migrateToCurrent(raw) {
 	if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return sanitizeProgress(null);
 	const parsed = /** @type {Record<string, unknown>} */ (raw);
-	if (parsed.version === undefined || parsed.version === STORAGE_VERSION) {
+	if (parsed.version === STORAGE_VERSION) {
 		return sanitizeProgress(parsed);
 	}
-	// Unknown future or past version: keep whatever is still readable.
+	if (parsed.version === 1 || parsed.version === undefined) {
+		// v1 era (server mirrors never carried a version): lesson ids and
+		// editor snapshots reference a deleted curriculum, so the readable
+		// move is a reset, not a remap.
+		return sanitizeProgress(null);
+	}
+	// Unknown future version: keep whatever is still readable.
 	return sanitizeProgress(parsed);
 }

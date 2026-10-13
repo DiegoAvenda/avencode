@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
-	import { lessonList, modules, phases } from '#lib/content/notas/lessons.js';
+	import { lessonList, modules, phases } from '#lib/content/roadmap/lessons.js';
 	import { createProgressStore } from '#lib/stores/progress.svelte.js';
 
 	const progress = createProgressStore();

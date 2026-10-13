@@ -8,10 +8,10 @@ import {
 	migrateToCurrent,
 	sanitizeProgress
 } from '../src/lib/stores/progressMigrations.js';
-import { lessonList } from '../src/lib/content/notas/lessons.js';
+import { lessonList } from '../src/lib/content/roadmap/lessons.js';
 
-test('the storage version starts at 1 for the new curriculum', () => {
-	assert.equal(STORAGE_VERSION, 1);
+test('the storage version is 2 for the Skill Roadmap curriculum', () => {
+	assert.equal(STORAGE_VERSION, 2);
 });
 
 test('the lesson bound matches the shipped curriculum', () => {
@@ -89,4 +89,39 @@ test('migrateToCurrent keeps what is readable on unknown versions', () => {
 	});
 	assert.equal(migrated.currentLesson, 4);
 	assert.deepEqual(migrated.completedLessons, [4]);
+});
+
+test('previous-curriculum payloads (v1 or version-less) reset to fresh defaults', () => {
+	const fresh = { currentLesson: 1, completedLessons: [], editorContents: {} };
+	assert.deepEqual(
+		migrateToCurrent({
+			version: 1,
+			currentLesson: 9,
+			completedLessons: [1, 9],
+			editorContents: { 9: { html: 'a', css: 'b', javascript: 'c' } }
+		}),
+		fresh
+	);
+	assert.deepEqual(
+		migrateToCurrent({
+			currentLesson: 5,
+			completedLessons: [5],
+			editorContents: {}
+		}),
+		fresh,
+		'server mirrors never carried a version, so missing version means v1'
+	);
+	assert.deepEqual(migrateToCurrent(fresh), fresh, 'migration is idempotent');
+});
+
+test('a current-version payload round-trips through the migration', () => {
+	assert.deepEqual(
+		migrateToCurrent({
+			version: 2,
+			currentLesson: 11,
+			completedLessons: [10],
+			editorContents: {}
+		}),
+		{ currentLesson: 11, completedLessons: [10], editorContents: {} }
+	);
 });
