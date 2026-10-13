@@ -9,7 +9,7 @@ import {
 	loadLesson,
 	modules,
 	phases
-} from '../src/lib/content/notas/lessons.js';
+} from '../src/lib/content/roadmap/lessons.js';
 
 const lessons = await loadAllLessons();
 

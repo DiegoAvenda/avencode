@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { lessonList } from '#lib/content/notas/lessons.js';
+import { lessonList } from '#lib/content/roadmap/lessons.js';
 
 /** @type {import('./$types').PageLoad} */
 export function load({ params }) {

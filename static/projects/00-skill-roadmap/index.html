@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Skill Roadmap — Reference Solution</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<main class="app">
+		<h1 class="app-title">Skill Roadmap</h1>
+		<div class="composer">
+			<input id="node-title" class="node-input" placeholder="New skill title..." />
+			<button id="add-btn" class="btn" type="button">Add Skill</button>
+		</div>
+		<div class="composer">
+			<input id="edge-from" class="node-input" placeholder="Skill id..." />
+			<input id="edge-to" class="node-input" placeholder="Requires skill id..." />
+			<button id="add-edge-btn" class="btn" type="button">Add Prerequisite</button>
+		</div>
+		<p id="status" class="status"></p>
+		<section id="roadmap" class="roadmap" aria-label="Roadmap"></section>
+		<h2 class="section-title">Next step</h2>
+		<ul id="next-list" class="next-list"></ul>
+		<p id="counts" class="counts"></p>
+	</main>
+	<script src="app.js"></script>
+</body>
+</html>

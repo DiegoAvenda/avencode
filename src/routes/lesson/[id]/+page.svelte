@@ -10,7 +10,7 @@
 		lessonList,
 		loadLesson,
 		modules
-	} from '#lib/content/notas/lessons.js';
+	} from '#lib/content/roadmap/lessons.js';
 	import { createProgressStore } from '#lib/stores/progress.svelte.js';
 
 	let { data } = $props();
