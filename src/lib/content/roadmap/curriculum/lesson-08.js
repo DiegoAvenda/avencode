@@ -1,320 +1,195 @@
-// Skill Roadmap — Lesson 8: Persist with localStorage
+// Data-Driven Resume — Lesson 8: Template Literals
 export default {
 	id: 8,
-	title: 'Persist with localStorage',
-	description: `Reload the page and the map dies. This lesson persists the \`nodes\` array in \`localStorage\` under one key: every mutation saves, startup loads, and anything unexpected (nothing saved, corrupt text, wrong shape) falls back to the seed map with a console note.\n\nA **Reset** button wipes the save and restores the seeds, so experiments are always reversible.`,
-	task: `1. Press Run, add a skill, reload the preview: your skill survives.\n2. Open the console, type garbage into the key with \`localStorage.setItem\`, reload: the app starts fresh instead of crashing.\n3. Press Reset and confirm the seeds return.`,
-	concept: `**Serialize the state, guard the load** — \`JSON.stringify\` turns the array into text for storage; \`JSON.parse\` plus shape checks turn text back into a map you can trust. The loader returns \`null\` for anything it cannot understand, and the caller picks the seeds. Persistence you cannot corrupt is persistence you can rely on.`,
-	whyItMatters: `Client state that evaporates on reload is a toy. Save-on-mutate plus defensive load is the smallest honest persistence story, and it ports to every storage API you will meet.`,
+	title: 'Template Literals',
+	description: `Text plus variables with \`+\` gets unreadable as soon as HTML is involved. **Template literals** use backticks and \`\${}\` interpolation, so a card can be written as the HTML it produces.\n\nThis lesson renders the profile and the first two experience cards with \`innerHTML\`. Write the same card twice by hand on purpose: the duplication is the setup for the loop in lesson 9.`,
+	task: `1. Press Run: two job cards appear.\n2. Add a third job to the \`experience\` array and copy one card block for it (yes, manually).\n3. Add a \`skills\` line to the card template using \`job.skills.join(", ")\`.\n4. Read the console: it prints the generated HTML string before the browser parses it.`,
+	concept: `**A template literal is a string with holes** — everything between \`\${}\` is evaluated as JavaScript and pasted into the text. \`element.innerHTML = htmlString\` parses that string into real elements. Because HTML is parsed, interpolated text is *markup*, not plain text — never paste untrusted input into \`innerHTML\` without escaping it first.`,
+	whyItMatters: `Template literals are the bridge between data and markup: readable enough to see the shape of the output, powerful enough to generate any card. The security note matters from day one — this is how injection bugs are born.`,
 	starterCode: {
 		html: `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Skill Roadmap — Lesson 8</title>
+<title>Data-Driven Resume — Lesson 8</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<main class="app">
-<h1 class="app-title">Skill Roadmap</h1>
-<div class="composer">
-<input id="node-title" class="node-input" placeholder="New skill title..." />
-<button id="add-btn" class="btn" type="button">Add Skill</button>
-</div>
-<div class="composer">
-<input id="edge-from" class="node-input" placeholder="Skill id..." />
-<input id="edge-to" class="node-input" placeholder="Requires skill id..." />
-<button id="add-edge-btn" class="btn" type="button">Add Prerequisite</button>
-</div>
-<div class="toolbar">
-<button id="reset-btn" class="btn" type="button">Reset</button>
-<p id="status" class="status"></p>
-</div>
-<section id="roadmap" class="roadmap" aria-label="Roadmap"></section>
-<pre id="report" class="report">Saved map loads on start.</pre>
+<header class="resume-header">
+<h1 id="profile-name" class="resume-name"></h1>
+<p id="profile-role" class="resume-role"></p>
+<p class="resume-contact"><span id="profile-email"></span></p>
+</header>
+<main class="resume">
+<section class="resume-section" aria-labelledby="experience-title">
+<h2 id="experience-title" class="section-title">Experience</h2>
+<div id="experience-list" class="card-list"></div>
+</section>
+<p id="status" class="status" aria-live="polite"></p>
 </main>
+<footer class="resume-footer">
+<p class="footer-text">Built with HTML, CSS and JavaScript.</p>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>`,
 		css: `body {
-background: #f4f6fb;
-color: #1c2430;
-font-family: system-ui, sans-serif;
-margin: 0;
+	background: #f4f6fb;
+	color: #1c2430;
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+	margin: 0;
 }
 
-.app {
-margin: 32px auto;
-max-width: 640px;
-padding: 0 16px;
+.resume-header {
+	background: #101828;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 36px 20px;
+	text-align: center;
 }
 
-.app-title {
-font-size: 28px;
-margin: 0 0 8px;
+.resume-name {
+	font-size: 32px;
+	margin: 0;
 }
 
-.composer {
-display: flex;
-gap: 8px;
-align-items: flex-start;
-margin-top: 8px;
+.resume-role {
+	color: #7dd3fc;
+	font-weight: 600;
+	margin: 0;
 }
 
-.toolbar {
-display: flex;
-gap: 12px;
-align-items: center;
-margin-top: 12px;
-flex-wrap: wrap;
+.resume-contact {
+	color: #94a3b8;
+	font-size: 13px;
+	margin: 0;
 }
 
-.node-input {
-flex: 1;
-border: 1px solid #c7d0dd;
-border-radius: 8px;
-font: inherit;
-padding: 8px 12px;
+.resume {
+	margin: 0 auto;
+	max-width: 720px;
+	padding: 28px 20px;
 }
 
-.btn {
-background: #2563eb;
-border: none;
-border-radius: 8px;
-color: #fff;
-cursor: pointer;
-font: inherit;
-padding: 10px 16px;
+.resume-section {
+	background: #fff;
+	border: 1px solid #e1e7f0;
+	border-radius: 12px;
+	padding: 18px 20px;
 }
 
-.btn:hover {
-background: #1d4ed8;
+.section-title {
+	border-bottom: 2px solid #2563eb;
+	font-size: 16px;
+	letter-spacing: 1px;
+	margin: 0 0 14px;
+	padding-bottom: 6px;
+	text-transform: uppercase;
+}
+
+.card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.card {
+	background: #fbfcfe;
+	border: 1px solid #e1e7f0;
+	border-radius: 10px;
+	padding: 14px 16px;
+}
+
+.card-title {
+	font-size: 16px;
+	margin: 0;
+}
+
+.card-subtitle {
+	color: #2563eb;
+	font-weight: 600;
+	margin: 2px 0 0;
+}
+
+.card-meta {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 6px 0 0;
 }
 
 .status {
-color: #5b6572;
-font-size: 13px;
-margin: 0;
+	color: #5b6572;
+	font-size: 13px;
+	margin: 14px 0 0;
 }
 
-.roadmap {
-display: grid;
-gap: 8px;
-margin-top: 16px;
+.resume-footer {
+	border-top: 1px solid #d7dee9;
+	padding: 18px;
+	text-align: center;
 }
 
-.node {
-display: flex;
-gap: 8px;
-align-items: center;
-background: #fff;
-border: 1px solid #e1e7f0;
-border-radius: 8px;
-padding: 8px 12px;
-}
-
-.node-title {
-flex: 1;
-font-weight: bold;
-margin: 0;
-}
-
-.node-status {
-color: #5b6572;
-font-size: 13px;
-margin: 0;
-}
-
-.node-done {
-background: transparent;
-border: 1px solid #12b76a;
-border-radius: 8px;
-color: #027a48;
-cursor: pointer;
-font: inherit;
-padding: 6px 10px;
-}
-
-.report {
-background: #101828;
-border-radius: 8px;
-color: #d1fadf;
-font-family: ui-monospace, monospace;
-font-size: 13px;
-margin-top: 16px;
-overflow-x: auto;
-padding: 12px 16px;
+.footer-text {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 0;
 }`,
-		javascript: `// Skill Roadmap — Lesson 8: Persist with localStorage
-const titleInput = document.getElementById("node-title");
-const addButton = document.getElementById("add-btn");
-const fromInput = document.getElementById("edge-from");
-const toInput = document.getElementById("edge-to");
-const addEdgeButton = document.getElementById("add-edge-btn");
-const resetButton = document.getElementById("reset-btn");
-const roadmap = document.getElementById("roadmap");
-const status = document.getElementById("status");
-const report = document.getElementById("report");
-const STORAGE_KEY = "skill-roadmap";
-function seedNodes() {
-return [
-{ id: "html", title: "HTML Basics", status: "done", prerequisites: [], branch: "Markup" },
-{ id: "css", title: "CSS Basics", status: "in-progress", prerequisites: ["html"], branch: "Styling" },
-{ id: "js", title: "JS Basics", status: "todo", prerequisites: ["css"], branch: "Scripting" },
-{ id: "dom", title: "DOM Intro", status: "todo", prerequisites: ["html", "js"], branch: "Scripting" }
+		javascript: `// Data-Driven Resume — Lesson 8: Template Literals
+const profile = {
+	name: "Diego",
+	role: "Frontend Developer",
+	email: "diego@example.com"
+};
+
+const experience = [
+	{
+		company: "Teleperformance",
+		position: "Subject Matter Expert",
+		start: 2023,
+		end: 2026,
+		skills: ["training", "quality"]
+	},
+	{
+		company: "Villa la Valencia",
+		position: "Front Desk Agent",
+		start: 2022,
+		end: 2023,
+		skills: ["customer service", "english"]
+	}
 ];
-}
-function loadNodes() {
-try {
-const raw = localStorage.getItem(STORAGE_KEY);
-if (raw === null) {
-return null;
-}
-const parsed = JSON.parse(raw);
-if (Array.isArray(parsed)) {
-return parsed;
-}
-return null;
-} catch (error) {
-console.log("Saved map was unreadable. Starting fresh.");
-return null;
-}
-}
-let nodes = loadNodes() || seedNodes();
-function saveNodes() {
-localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
-}
-function nodeById(id) {
-for (const node of nodes) {
-if (node.id === id) {
-return node;
-}
-}
-return undefined;
-}
-function wouldCreateCycle(fromId, toId) {
-if (fromId === toId) {
-return true;
-}
-const visited = {};
-function reaches(id) {
-if (id === fromId) {
-return true;
-}
-if (visited[id] === true) {
-return false;
-}
-visited[id] = true;
-const node = nodeById(id);
-const parents = node === undefined ? [] : node.prerequisites;
-for (const parent of parents) {
-if (reaches(parent)) {
-return true;
-}
-}
-return false;
-}
-return reaches(toId);
-}
-function getStatus(node) {
-switch (node.status) {
-case "done":
-return "done";
-case "in-progress":
-return "in progress";
-default: {
-const allDone = node.prerequisites.every(function (id) {
-return nodeById(id) !== undefined && nodeById(id).status === "done";
-});
-switch (allDone) {
-case true:
-return "ready";
-default:
-return "blocked";
-}
-}
-}
-}
-function slug(title) {
-return title.toLowerCase().trim().split(" ").join("-");
-}
-function render() {
-roadmap.innerHTML = "";
-for (const node of nodes) {
-const card = document.createElement("div");
-card.className = "node";
-const heading = document.createElement("p");
-heading.className = "node-title";
-heading.textContent = node.title;
-card.appendChild(heading);
-const state = document.createElement("p");
-state.className = "node-status";
-state.textContent = getStatus(node);
-card.appendChild(state);
-const done = document.createElement("button");
-done.className = "node-done";
-done.textContent = "Done";
-done.type = "button";
-done.addEventListener("click", function () {
-markDone(node.id);
-});
-card.appendChild(done);
-roadmap.appendChild(card);
-}
-status.textContent = nodes.length + " skills on the map";
-report.textContent = "Saved " + nodes.length + " skills under " + STORAGE_KEY + ".";
-}
-function markDone(id) {
-const node = nodeById(id);
-if (node === undefined) {
-return;
-}
-node.status = "done";
-saveNodes();
-render();
-}
-function addNode() {
-const title = titleInput.value.trim();
-if (title === "") {
-console.log("A skill needs a title.");
-return;
-}
-const id = slug(title);
-if (nodeById(id) !== undefined) {
-console.log("That id is taken: " + id);
-return;
-}
-nodes.push({ id: id, title: title, status: "todo", prerequisites: [], branch: "Scripting" });
-titleInput.value = "";
-saveNodes();
-render();
-}
-function addEdge() {
-const from = fromInput.value.trim();
-const to = toInput.value.trim();
-if (from === "" || to === "") {
-console.log("Both fields need an id.");
-} else if (nodeById(from) === undefined || nodeById(to) === undefined) {
-console.log("Unknown skill id.");
-} else if (nodeById(from).prerequisites.indexOf(to) !== -1) {
-console.log("That link already exists.");
-} else if (wouldCreateCycle(from, to)) {
-console.log("Refused: that link would close a loop.");
-} else {
-nodeById(from).prerequisites.push(to);
-saveNodes();
-render();
-}
-}
-function resetAll() {
-nodes = seedNodes();
-saveNodes();
-render();
-console.log("Map reset to the seeds.");
-}
-addButton.addEventListener("click", addNode);
-addEdgeButton.addEventListener("click", addEdge);
-resetButton.addEventListener("click", resetAll);
-render();`
+
+document.getElementById("profile-name").textContent = profile.name;
+document.getElementById("profile-role").textContent = profile.role;
+document.getElementById("profile-email").textContent = profile.email;
+
+const list = document.getElementById("experience-list");
+const firstJob = experience[0];
+const secondJob = experience[1];
+
+const firstCard = \`
+<article class="card">
+<h3 class="card-title">\${firstJob.position}</h3>
+<p class="card-subtitle">\${firstJob.company}</p>
+<p class="card-meta">\${firstJob.start} — \${firstJob.end}</p>
+</article>
+\`;
+
+const secondCard = \`
+<article class="card">
+<h3 class="card-title">\${secondJob.position}</h3>
+<p class="card-subtitle">\${secondJob.company}</p>
+<p class="card-meta">\${secondJob.start} — \${secondJob.end}</p>
+</article>
+\`;
+
+list.innerHTML = firstCard + secondCard;
+document.getElementById("status").textContent = "Two cards written by hand. Lesson 9 removes the copy-paste.";
+
+console.log("Generated HTML:", list.innerHTML);
+console.log("Cards rendered: " + list.children.length);
+`
 	}
 };

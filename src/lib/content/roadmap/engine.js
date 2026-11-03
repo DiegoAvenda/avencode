@@ -1,5 +1,5 @@
 /**
- * Reference engine for Module 0 ("Skill Roadmap").
+ * Reference engine for Module 2 ("Skill Roadmap").
  *
  * These are the canonical implementations of what learners build across the
  * lessons: derived node status (A3), layer depth (A6), cycle detection (A7),
@@ -8,7 +8,7 @@
  * spec; the learner-facing starter code in `curriculum/` mirrors these
  * functions in vanilla page scripts.
  *
- * KNOWN LIMITATION (taught in lesson 16, fixed in Module 1): this engine
+ * KNOWN LIMITATION (taught near the end of the module, fixed later): this engine
  * notifies subscribers depth-first with no topological ordering, so in a
  * diamond (two branches converging on one node) a downstream effect runs
  * twice and can observe a mix of new and stale values. See the diamond test.

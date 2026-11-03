@@ -1,258 +1,223 @@
-// Skill Roadmap — Lesson 10: The Pain Point: Views That Lie
+// Data-Driven Resume — Lesson 10: Functions: Name the Steps
 export default {
 	id: 10,
-	title: 'The Pain Point: Views That Lie',
-	description: `This lesson ships **broken on purpose**. The global progress bar renders once at startup and never again; the path highlight paints once when you press its button and never again. Mark \`css\` done and both views lie to your face.\n\nDo not just read about desynchronisation — live it. Click around, catch each view lying, and notice the exact shape of the pain: every new view adds a render call you must remember in every mutation. Then fix it the only honest way Part A allows: call both renders from \`renderAll\`.`,
-	task: `1. Press Run, note the bar percent, then mark \`css\` done: the bar does not move. That is the bug.\n2. Add a skill, press Highlight path, then complete a prerequisite: the highlight does not move either.\n3. Fix both by calling \`renderProgress\` and \`renderHighlight\` inside \`renderAll\`.\n4. Write down, in one sentence, when you would forget a call in a bigger app.`,
-	concept: `**Manual sync does not scale** — with N views and M mutations you must remember N × M calls, and the compiler will not remind you. A view that renders once is a snapshot; a view that re-renders on every change is a mirror. Part A can only build snapshots and remember harder. Part B builds mirrors.`,
-	whyItMatters: `This is the hinge of the whole module. Every reactivity system ever sold exists because of the afternoon you just had: one more view, one forgotten call, one lying pixel. Feel it now so the engine next lesson lands as relief, not magic.`,
+	title: 'Functions: Name the Steps',
+	description: `The script works, but it is one long run-on sentence. This lesson names each step: \`renderProfile\`, \`formatPeriod\`, \`createJobCard\` and \`renderJobs\`. Each function takes what it needs as a parameter and returns what it produces.\n\nThe page looks the same. That is the point: good refactors change the shape of the code, not the shape of the output.`,
+	task: `1. Press Run and confirm the resume still renders exactly as in lesson 9.\n2. Change \`formatPeriod\` to return only the start year and run again.\n3. Change \`formatPeriod\` to accept two numbers instead of a job object, then update its caller.\n4. Read the console: \`renderJobs\` returns how many cards it rendered.`,
+	concept: `**A function is a named, reusable step** — parameters are the inputs, \`return\` is the output, and local variables live only inside the body. Splitting \`renderJobs\` (orchestration) from \`createJobCard\` (one item) means a bug in one card has exactly one place to live. Functions should do one thing and say so in their name.`,
+	whyItMatters: `You will read far more code than you write. Named steps are the difference between "something is broken somewhere" and "the period formatter is wrong". This is also the exact shape of the components and helpers you will use in every framework.`,
 	starterCode: {
 		html: `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Skill Roadmap — Lesson 10</title>
+<title>Data-Driven Resume — Lesson 10</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<main class="app">
-<h1 class="app-title">Skill Roadmap</h1>
-<div class="progress">
-<div class="progress-track">
-<div id="progress-fill" class="progress-fill"></div>
-</div>
-<p id="progress-label" class="progress-label"></p>
-</div>
-<div class="composer">
-<button id="highlight-btn" class="btn" type="button">Highlight path</button>
-<p id="status" class="status"></p>
-</div>
-<section id="roadmap" class="roadmap" aria-label="Roadmap"></section>
-<p id="counts" class="counts"></p>
+<header class="resume-header">
+<h1 id="profile-name" class="resume-name"></h1>
+<p id="profile-role" class="resume-role"></p>
+<p class="resume-contact"><span id="profile-email"></span></p>
+</header>
+<main class="resume">
+<section class="resume-section" aria-labelledby="experience-title">
+<h2 id="experience-title" class="section-title">Experience</h2>
+<div id="experience-list" class="card-list"></div>
+</section>
+<p id="status" class="status" aria-live="polite"></p>
 </main>
+<footer class="resume-footer">
+<p class="footer-text">Built with HTML, CSS and JavaScript.</p>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>`,
 		css: `body {
-background: #f4f6fb;
-color: #1c2430;
-font-family: system-ui, sans-serif;
-margin: 0;
+	background: #f4f6fb;
+	color: #1c2430;
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+	margin: 0;
 }
 
-.app {
-margin: 32px auto;
-max-width: 640px;
-padding: 0 16px;
+.resume-header {
+	background: #101828;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 36px 20px;
+	text-align: center;
 }
 
-.app-title {
-font-size: 28px;
-margin: 0 0 8px;
+.resume-name {
+	font-size: 32px;
+	margin: 0;
 }
 
-.composer {
-display: flex;
-gap: 8px;
-align-items: center;
-margin-top: 8px;
+.resume-role {
+	color: #7dd3fc;
+	font-weight: 600;
+	margin: 0;
 }
 
-.btn {
-background: #2563eb;
-border: none;
-border-radius: 8px;
-color: #fff;
-cursor: pointer;
-font: inherit;
-padding: 10px 16px;
+.resume-contact {
+	color: #94a3b8;
+	font-size: 13px;
+	margin: 0;
 }
 
-.btn:hover {
-background: #1d4ed8;
+.resume {
+	margin: 0 auto;
+	max-width: 720px;
+	padding: 28px 20px;
+}
+
+.resume-section {
+	background: #fff;
+	border: 1px solid #e1e7f0;
+	border-radius: 12px;
+	padding: 18px 20px;
+}
+
+.section-title {
+	border-bottom: 2px solid #2563eb;
+	font-size: 16px;
+	letter-spacing: 1px;
+	margin: 0 0 14px;
+	padding-bottom: 6px;
+	text-transform: uppercase;
+}
+
+.card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.card {
+	background: #fbfcfe;
+	border: 1px solid #e1e7f0;
+	border-radius: 10px;
+	padding: 14px 16px;
+}
+
+.card-title {
+	font-size: 16px;
+	margin: 0;
+}
+
+.card-subtitle {
+	color: #2563eb;
+	font-weight: 600;
+	margin: 2px 0 0;
+}
+
+.card-meta {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 6px 0 0;
 }
 
 .status {
-color: #5b6572;
-font-size: 13px;
-margin: 0;
+	color: #5b6572;
+	font-size: 13px;
+	margin: 14px 0 0;
 }
 
-.counts {
-color: #5b6572;
-font-size: 13px;
+.resume-footer {
+	border-top: 1px solid #d7dee9;
+	padding: 18px;
+	text-align: center;
 }
 
-.progress {
-margin-top: 8px;
-}
-
-.progress-track {
-background: #e1e7f0;
-border-radius: 8px;
-height: 12px;
-overflow: hidden;
-}
-
-.progress-fill {
-background: #12b76a;
-height: 100%;
-width: 0;
-}
-
-.progress-label {
-color: #5b6572;
-font-size: 13px;
-margin: 4px 0 0;
-}
-
-.roadmap {
-display: grid;
-gap: 8px;
-margin-top: 16px;
-}
-
-.node {
-display: flex;
-gap: 8px;
-align-items: center;
-background: #fff;
-border: 1px solid #e1e7f0;
-border-radius: 8px;
-padding: 8px 12px;
-}
-
-.node-title {
-flex: 1;
-font-weight: bold;
-margin: 0;
-}
-
-.node-status {
-color: #5b6572;
-font-size: 13px;
-margin: 0;
-}
-
-.node-done {
-background: transparent;
-border: 1px solid #12b76a;
-border-radius: 8px;
-color: #027a48;
-cursor: pointer;
-font: inherit;
-padding: 6px 10px;
-}
-
-.ready {
-border-color: #12b76a;
-box-shadow: 0 0 0 2px #12b76a;
+.footer-text {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 0;
 }`,
-		javascript: `// Skill Roadmap — Lesson 10: The Pain Point: Views That Lie
-const progressFill = document.getElementById("progress-fill");
-const progressLabel = document.getElementById("progress-label");
-const highlightButton = document.getElementById("highlight-btn");
-const roadmap = document.getElementById("roadmap");
-const status = document.getElementById("status");
-const counts = document.getElementById("counts");
-const nodes = [
-{ id: "html", title: "HTML Basics", status: "done", prerequisites: [], branch: "Markup" },
-{ id: "css", title: "CSS Basics", status: "in-progress", prerequisites: ["html"], branch: "Styling" },
-{ id: "js", title: "JS Basics", status: "todo", prerequisites: ["css"], branch: "Scripting" },
-{ id: "dom", title: "DOM Intro", status: "todo", prerequisites: ["html", "js"], branch: "Scripting" }
+		javascript: `// Data-Driven Resume — Lesson 10: Functions: Name the Steps
+const profile = {
+	name: "Diego",
+	role: "Frontend Developer",
+	email: "diego@example.com"
+};
+
+const experience = [
+	{
+		company: "Teleperformance",
+		position: "Subject Matter Expert",
+		start: 2023,
+		end: 2026,
+		skills: ["training", "quality"]
+	},
+	{
+		company: "Villa la Valencia",
+		position: "Front Desk Agent",
+		start: 2022,
+		end: 2023,
+		skills: ["customer service", "english"]
+	},
+	{
+		company: "Freelance",
+		position: "Frontend Developer",
+		start: 2024,
+		end: 2026,
+		skills: ["html", "css", "javascript"]
+	}
 ];
-function nodeById(id) {
-for (const node of nodes) {
-if (node.id === id) {
-return node;
+
+function renderProfile(person) {
+	document.getElementById("profile-name").textContent = person.name;
+	document.getElementById("profile-role").textContent = person.role;
+	document.getElementById("profile-email").textContent = person.email;
 }
+
+function formatPeriod(job) {
+	return job.start + " — " + job.end;
 }
-return undefined;
+
+function createJobCard(job) {
+	return \`
+<article class="card">
+<h3 class="card-title">\${job.position}</h3>
+<p class="card-subtitle">\${job.company}</p>
+<p class="card-meta">\${formatPeriod(job)}</p>
+<p class="card-meta">Skills: \${job.skills.join(", ")}</p>
+</article>
+\`;
 }
-function getStatus(node) {
-switch (node.status) {
-case "done":
-return "done";
-case "in-progress":
-return "in progress";
-default: {
-const allDone = node.prerequisites.every(function (id) {
-return nodeById(id) !== undefined && nodeById(id).status === "done";
-});
-switch (allDone) {
-case true:
-return "ready";
-default:
-return "blocked";
+
+function renderJobs(jobs, container) {
+	let html = "";
+	for (const job of jobs) {
+		html += createJobCard(job);
+	}
+	container.innerHTML = html;
+	return jobs.length;
 }
+
+function countSkills(jobs) {
+	let total = 0;
+	for (const job of jobs) {
+		total = total + job.skills.length;
+	}
+	return total;
 }
-}
-}
-function renderProgress() {
-const done = nodes.filter(function (node) {
-return node.status === "done";
-}).length;
-const percent = nodes.length === 0 ? 0 : Math.round((done / nodes.length) * 100);
-progressFill.style.width = percent + "%";
-progressLabel.textContent = percent + "% complete";
-console.log("Bar repainted at " + percent + "%.");
-}
-function renderHighlight() {
-const cards = roadmap.children;
-for (let index = 0; index < cards.length; index = index + 1) {
-const node = nodes[index];
-if (node !== undefined && getStatus(node) === "ready") {
-cards[index].className = "node ready";
-} else {
-cards[index].className = "node";
-}
-}
-console.log("Highlight repainted.");
-}
-function renderRoadmap() {
-roadmap.innerHTML = "";
-for (const node of nodes) {
-const card = document.createElement("div");
-card.className = "node";
-const heading = document.createElement("p");
-heading.className = "node-title";
-heading.textContent = node.title;
-card.appendChild(heading);
-const state = document.createElement("p");
-state.className = "node-status";
-state.textContent = getStatus(node);
-card.appendChild(state);
-const done = document.createElement("button");
-done.className = "node-done";
-done.textContent = "Done";
-done.type = "button";
-done.addEventListener("click", function () {
-markDone(node.id);
-});
-card.appendChild(done);
-roadmap.appendChild(card);
-}
-const doneCount = nodes.filter(function (node) {
-return node.status === "done";
-}).length;
-counts.textContent = doneCount + " of " + nodes.length + " skills done";
-status.textContent = nodes.length + " skills on the map";
-}
-function renderAll() {
-// THE BUG, ON PURPOSE: renderProgress and renderHighlight are missing here.
-// Add both calls and the bar plus highlight stop lying.
-renderRoadmap();
-}
-function markDone(id) {
-const node = nodeById(id);
-if (node === undefined) {
-return;
-}
-node.status = "done";
-renderAll();
-}
-highlightButton.addEventListener("click", renderHighlight);
-renderAll();
-renderProgress();`
+
+renderProfile(profile);
+
+const list = document.getElementById("experience-list");
+const rendered = renderJobs(experience, list);
+const skills = countSkills(experience);
+
+document.getElementById("status").textContent =
+	rendered + " jobs rendered by functions, " + skills + " skills in total.";
+
+console.log("renderJobs returned:", rendered);
+console.log("countSkills returned:", skills);
+// console.log(total); // ReferenceError: total only exists inside countSkills.
+`
 	}
 };

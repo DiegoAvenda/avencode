@@ -1,292 +1,134 @@
-// Skill Roadmap — Lesson 4: Complete a Skill, Recalculate by Hand
+// Data-Driven Resume — Lesson 4: Objects: Model Your Profile
 export default {
 	id: 4,
-	title: 'Complete a Skill, Recalculate by Hand',
-	description: `Derived status is useless without a way to change stored status. This lesson adds a **Done** button to every card, plus two new views: a **next step** list (every ready skill) and **counters** (done of total).\n\nOne click recalculates everything by hand: the node, its dependents, the progress, the next-step list and the counters — five explicit calls in \`markDone\`. Count them. Their number is the lesson of Part A.`,
-	task: `1. Press Run, then mark \`css\` done: watch \`js\` flip to ready, the next-step list and the counters move.\n2. Open \`markDone\` and count the render calls one click triggers.\n3. Add a skill with two prerequisites and confirm the next-step list waits for both.`,
-	concept: `**Manual recalculation** — without reactivity, every state change must call every render that could be affected: the node, its dependents, the progress, the next steps, the counters. Miss one call and a view lies. This explicit list is Part A's engine, and Part B exists to delete it.`,
-	whyItMatters: `You cannot appreciate automatic updates until you have been the update mechanism. This is the "pain first" half of the module: live it now, automate it later.`,
+	title: 'Objects: Model Your Profile',
+	description: `One variable per fact stops scaling immediately. This lesson groups your professional identity into a single **object**: properties with names, values with types, and a nested object for links.\n\nYou will read properties with dot notation and bracket notation, change them, add new ones and inspect the shape with \`Object.keys()\`. The page still does not change — the model is the deliverable.`,
+	task: `1. Press Run and read the profile object printed in the console.\n2. Replace the values with your own name, role, location and links.\n3. Add a \`phone\` property using both dot notation and bracket notation.\n4. Change \`openToWork\` to \`false\` and print the whole object with \`console.log(profile)\`.`,
+	concept: `**An object is a named record** — \`{ key: value }\` keeps related facts together. Dot notation (\`profile.name\`) is for fixed names; bracket notation (\`profile["role"]\`) is for dynamic keys, spaces or keys stored in a variable. \`const\` protects the binding, not the contents: adding or changing properties is allowed.`,
+	whyItMatters: `Every API response, configuration file and component prop you will meet later is an object. Modelling your own information first — instead of copying a schema — teaches you to ask "what are the facts, and what are their names?" before writing a line of UI.`,
 	starterCode: {
 		html: `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Skill Roadmap — Lesson 4</title>
+<title>Data-Driven Resume — Lesson 4</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<main class="app">
-<h1 class="app-title">Skill Roadmap</h1>
-<div class="composer">
-<input id="node-title" class="node-input" placeholder="New skill title..." />
-<button id="add-btn" class="btn" type="button">Add Skill</button>
-</div>
-<div class="composer">
-<input id="edge-from" class="node-input" placeholder="Skill id..." />
-<input id="edge-to" class="node-input" placeholder="Requires skill id..." />
-<button id="add-edge-btn" class="btn" type="button">Add Prerequisite</button>
-</div>
-<p id="status" class="status"></p>
-<section id="roadmap" class="roadmap" aria-label="Roadmap"></section>
-<h2 class="section-title">Next step</h2>
-<ul id="next-list" class="next-list"></ul>
-<p id="counts" class="counts"></p>
+<header class="resume-header">
+<h1 class="resume-name">Your Name</h1>
+<p class="resume-role">Frontend Developer</p>
+<p class="resume-contact">you@example.com · github.com/you</p>
+</header>
+<main class="resume">
+<section class="resume-section" aria-labelledby="about-title">
+<h2 id="about-title" class="section-title">About</h2>
+<p class="placeholder" data-empty="about">The profile object lives in app.js for now.</p>
+</section>
 </main>
+<footer class="resume-footer">
+<p class="footer-text">Built with HTML, CSS and JavaScript.</p>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>`,
 		css: `body {
-background: #f4f6fb;
-color: #1c2430;
-font-family: system-ui, sans-serif;
-margin: 0;
+	background: #f4f6fb;
+	color: #1c2430;
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+	margin: 0;
 }
 
-.app {
-margin: 32px auto;
-max-width: 640px;
-padding: 0 16px;
+.resume-header {
+	background: #101828;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 36px 20px;
+	text-align: center;
 }
 
-.app-title {
-font-size: 28px;
-margin: 0 0 8px;
+.resume-name {
+	font-size: 32px;
+	margin: 0;
+}
+
+.resume-role {
+	color: #7dd3fc;
+	font-weight: 600;
+	margin: 0;
+}
+
+.resume-contact {
+	color: #94a3b8;
+	font-size: 13px;
+	margin: 0;
+}
+
+.resume {
+	margin: 0 auto;
+	max-width: 720px;
+	padding: 28px 20px;
+}
+
+.resume-section {
+	background: #fff;
+	border: 1px solid #e1e7f0;
+	border-radius: 12px;
+	padding: 18px 20px;
 }
 
 .section-title {
-font-size: 18px;
-margin: 24px 0 8px;
+	border-bottom: 2px solid #2563eb;
+	font-size: 16px;
+	letter-spacing: 1px;
+	margin: 0 0 14px;
+	padding-bottom: 6px;
+	text-transform: uppercase;
 }
 
-.composer {
-display: flex;
-gap: 8px;
-align-items: flex-start;
-margin-top: 8px;
+.placeholder {
+	color: #5b6572;
+	font-size: 14px;
+	margin: 0;
 }
 
-.node-input {
-flex: 1;
-border: 1px solid #c7d0dd;
-border-radius: 8px;
-font: inherit;
-padding: 8px 12px;
+.resume-footer {
+	border-top: 1px solid #d7dee9;
+	padding: 18px;
+	text-align: center;
 }
 
-.btn {
-background: #2563eb;
-border: none;
-border-radius: 8px;
-color: #fff;
-cursor: pointer;
-font: inherit;
-padding: 10px 16px;
-}
-
-.btn:hover {
-background: #1d4ed8;
-}
-
-.status {
-color: #5b6572;
-font-size: 13px;
-}
-
-.counts {
-color: #5b6572;
-font-size: 13px;
-}
-
-.roadmap {
-display: grid;
-gap: 8px;
-margin-top: 16px;
-}
-
-.next-list {
-display: grid;
-gap: 8px;
-list-style: none;
-margin: 0;
-padding: 0;
-}
-
-.next-item {
-background: #ecfdf3;
-border: 1px solid #12b76a;
-border-radius: 8px;
-padding: 8px 12px;
-}
-
-.node {
-display: flex;
-gap: 8px;
-align-items: center;
-background: #fff;
-border: 1px solid #e1e7f0;
-border-radius: 8px;
-padding: 8px 12px;
-}
-
-.node-title {
-flex: 1;
-font-weight: bold;
-margin: 0;
-}
-
-.node-status {
-color: #5b6572;
-font-size: 13px;
-margin: 0;
-}
-
-.node-done {
-background: transparent;
-border: 1px solid #12b76a;
-border-radius: 8px;
-color: #027a48;
-cursor: pointer;
-font: inherit;
-padding: 6px 10px;
+.footer-text {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 0;
 }`,
-		javascript: `// Skill Roadmap — Lesson 4: Complete a Skill, Recalculate by Hand
-const titleInput = document.getElementById("node-title");
-const addButton = document.getElementById("add-btn");
-const fromInput = document.getElementById("edge-from");
-const toInput = document.getElementById("edge-to");
-const addEdgeButton = document.getElementById("add-edge-btn");
-const roadmap = document.getElementById("roadmap");
-const status = document.getElementById("status");
-const nextList = document.getElementById("next-list");
-const counts = document.getElementById("counts");
-const nodes = [
-{ id: "html", title: "HTML Basics", status: "done", prerequisites: [] },
-{ id: "css", title: "CSS Basics", status: "in-progress", prerequisites: ["html"] },
-{ id: "js", title: "JS Basics", status: "todo", prerequisites: ["css"] },
-{ id: "dom", title: "DOM Intro", status: "todo", prerequisites: ["html", "js"] }
-];
-function nodeById(id) {
-for (const node of nodes) {
-if (node.id === id) {
-return node;
-}
-}
-return undefined;
-}
-function getStatus(node) {
-switch (node.status) {
-case "done":
-return "done";
-case "in-progress":
-return "in progress";
-default: {
-const allDone = node.prerequisites.every(function (id) {
-return nodeById(id) !== undefined && nodeById(id).status === "done";
-});
-switch (allDone) {
-case true:
-return "ready";
-default:
-return "blocked";
-}
-}
-}
-}
-function slug(title) {
-return title.toLowerCase().trim().split(" ").join("-");
-}
-function renderRoadmap() {
-roadmap.innerHTML = "";
-for (const node of nodes) {
-const card = document.createElement("div");
-card.className = "node";
-const heading = document.createElement("p");
-heading.className = "node-title";
-heading.textContent = node.title;
-card.appendChild(heading);
-const state = document.createElement("p");
-state.className = "node-status";
-state.textContent = getStatus(node);
-card.appendChild(state);
-const done = document.createElement("button");
-done.className = "node-done";
-done.textContent = "Done";
-done.type = "button";
-done.addEventListener("click", function () {
-markDone(node.id);
-});
-card.appendChild(done);
-roadmap.appendChild(card);
-}
-}
-function renderNext() {
-nextList.innerHTML = "";
-const ready = nodes.filter(function (node) {
-return getStatus(node) === "ready";
-});
-for (const node of ready) {
-const item = document.createElement("li");
-item.className = "next-item";
-item.textContent = node.title;
-nextList.appendChild(item);
-}
-console.log("Next up: " + ready.length + " skills.");
-}
-function renderCounts() {
-const done = nodes.filter(function (node) {
-return node.status === "done";
-}).length;
-counts.textContent = done + " of " + nodes.length + " skills done";
-status.textContent = nodes.length + " skills on the map";
-}
-function renderAll() {
-renderRoadmap();
-renderNext();
-renderCounts();
-}
-function markDone(id) {
-const node = nodeById(id);
-if (node === undefined) {
-return;
-}
-node.status = "done";
-renderRoadmap();
-renderNext();
-renderCounts();
-}
-function addNode() {
-const title = titleInput.value.trim();
-if (title === "") {
-console.log("A skill needs a title.");
-return;
-}
-const id = slug(title);
-if (nodeById(id) !== undefined) {
-console.log("That id is taken: " + id);
-return;
-}
-nodes.push({ id: id, title: title, status: "todo", prerequisites: [] });
-titleInput.value = "";
-renderAll();
-}
-function addEdge() {
-const from = fromInput.value.trim();
-const to = toInput.value.trim();
-if (from === "" || to === "") {
-console.log("Both fields need an id.");
-} else if (from === to) {
-console.log("A skill cannot require itself.");
-} else if (nodeById(from) === undefined || nodeById(to) === undefined) {
-console.log("Unknown skill id.");
-} else if (nodeById(from).prerequisites.indexOf(to) !== -1) {
-console.log("That link already exists.");
-} else {
-nodeById(from).prerequisites.push(to);
-renderAll();
-}
-}
-addButton.addEventListener("click", addNode);
-addEdgeButton.addEventListener("click", addEdge);
-renderAll();`
+		javascript: `// Data-Driven Resume — Lesson 4: Objects: Model Your Profile
+const profile = {
+	name: "Diego",
+	role: "Frontend Developer",
+	email: "diego@example.com",
+	location: "Valencia, Spain",
+	openToWork: true,
+	links: {
+		github: "github.com/diego",
+		linkedin: "linkedin.com/in/diego"
+	}
+};
+
+console.log("Name (dot): " + profile.name);
+console.log("Role (brackets): " + profile["role"]);
+console.log("GitHub (nested): " + profile.links.github);
+
+profile.location = "Remote";
+profile.availability = "Immediate";
+profile["openToWork"] = false;
+
+console.log("Keys: " + Object.keys(profile).join(", "));
+console.log("Updated object:", profile);
+`
 	}
 };

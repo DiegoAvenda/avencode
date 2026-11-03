@@ -1,187 +1,147 @@
-// Skill Roadmap — Lesson 2: Add Nodes and Links
+// Data-Driven Resume — Lesson 2: CSS and Flexbox Skin
 export default {
 	id: 2,
-	title: 'Add Nodes and Links',
-	description: `A hardcoded map cannot grow. This lesson adds two forms: one creates skill nodes from a title, the other links two skills with a prerequisite edge.\n\nBoth forms validate their input with \`if/else\` before touching the data: empty titles, duplicate ids, unknown ids and self-links are all refused with a console message.`,
-	task: `1. Press Run and add a skill called "DOM Intro".\n2. Link it: from \`dom-intro\`, requires \`js\`.\n3. Try each mistake on purpose (empty title, same title twice, unknown id, a skill requiring itself) and read the refusal message.`,
-	concept: `**Validate before you mutate** — an \`if/else\` chain at the top of a function guards the array below it. The data stays clean because no bad input ever reaches \`push\`. Slugs (lowercase, dashes instead of spaces) turn free text into stable ids.`,
-	whyItMatters: `Forms are where outside chaos meets your data. The habit of refusing bad input first, loudly, is what keeps every later feature honest.`,
+	title: 'CSS and Flexbox Skin',
+	description: `The skeleton now gets a skin. This lesson styles the resume without touching its structure: typography, colours, spacing, the box model and **Flexbox** for the header and the card lists.\n\nThe layout is mobile-first and becomes slightly roomier on wide screens. Nothing here depends on JavaScript yet — which is exactly the point: a resume should look complete even before its data arrives.`,
+	task: `1. Press Run and resize the preview: the header centres on small screens and aligns left on wide ones.\n2. Open the CSS tab and change the accent colour (\`#2563eb\`) in two places.\n3. Add a \`box-shadow\` to \`.resume-header\` and a \`border-radius\` to \`.card-list\`.\n4. Read the console to confirm the header is a Flexbox container and the page width.`,
+	concept: `**The box model plus one axis** — every element is content, padding, border and margin. Flexbox lays children along one axis with \`display: flex\`, and \`gap\` replaces margin hacks. \`flex-direction: column\` stacks the header lines; \`justify-content\` and \`align-items\` decide how they sit on the other axis.`,
+	whyItMatters: `Most "my layout is broken" bugs are really "I never decided which box owns the space". Flexbox gives you one predictable tool for rows and columns, and learning it with plain CSS means every framework later feels like a convenience, not magic.`,
 	starterCode: {
 		html: `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Skill Roadmap — Lesson 2</title>
+<title>Data-Driven Resume — Lesson 2</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<main class="app">
-<h1 class="app-title">Skill Roadmap</h1>
-<div class="composer">
-<input id="node-title" class="node-input" placeholder="New skill title..." />
-<button id="add-btn" class="btn" type="button">Add Skill</button>
-</div>
-<div class="composer">
-<input id="edge-from" class="node-input" placeholder="Skill id..." />
-<input id="edge-to" class="node-input" placeholder="Requires skill id..." />
-<button id="add-edge-btn" class="btn" type="button">Add Prerequisite</button>
-</div>
-<p id="status" class="status"></p>
-<section id="roadmap" class="roadmap" aria-label="Roadmap"></section>
+<header class="resume-header">
+<h1 class="resume-name">Your Name</h1>
+<p class="resume-role">Frontend Developer</p>
+<p class="resume-contact">you@example.com · github.com/you</p>
+</header>
+<main class="resume">
+<section class="resume-section" aria-labelledby="about-title">
+<h2 id="about-title" class="section-title">About</h2>
+<p class="placeholder" data-empty="about">This section will be generated from JavaScript.</p>
+</section>
+<section class="resume-section" aria-labelledby="experience-title">
+<h2 id="experience-title" class="section-title">Experience</h2>
+<div id="experience-list" class="card-list" data-empty="experience"></div>
+</section>
+<section class="resume-section" aria-labelledby="education-title">
+<h2 id="education-title" class="section-title">Education</h2>
+<div id="education-list" class="card-list" data-empty="education"></div>
+</section>
 </main>
+<footer class="resume-footer">
+<p class="footer-text">Built with HTML, CSS and JavaScript.</p>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>`,
 		css: `body {
-background: #f4f6fb;
-color: #1c2430;
-font-family: system-ui, sans-serif;
-margin: 0;
+	background: #f4f6fb;
+	color: #1c2430;
+	font-family: system-ui, sans-serif;
+	margin: 0;
+	line-height: 1.5;
 }
 
-.app {
-margin: 32px auto;
-max-width: 640px;
-padding: 0 16px;
+.resume-header {
+	background: #101828;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 36px 20px;
+	text-align: center;
 }
 
-.app-title {
-font-size: 28px;
-margin: 0 0 8px;
+.resume-name {
+	font-size: 32px;
+	letter-spacing: -0.5px;
+	margin: 0;
 }
 
-.composer {
-display: flex;
-gap: 8px;
-align-items: flex-start;
-margin-top: 8px;
+.resume-role {
+	color: #7dd3fc;
+	font-weight: 600;
+	margin: 0;
 }
 
-.node-input {
-flex: 1;
-border: 1px solid #c7d0dd;
-border-radius: 8px;
-font: inherit;
-padding: 8px 12px;
+.resume-contact {
+	color: #94a3b8;
+	font-size: 13px;
+	margin: 0;
 }
 
-.btn {
-background: #2563eb;
-border: none;
-border-radius: 8px;
-color: #fff;
-cursor: pointer;
-font: inherit;
-padding: 10px 16px;
+.resume {
+	margin: 0 auto;
+	max-width: 720px;
+	padding: 28px 20px;
 }
 
-.btn:hover {
-background: #1d4ed8;
+.resume-section {
+	background: #fff;
+	border: 1px solid #e1e7f0;
+	border-radius: 12px;
+	margin-bottom: 20px;
+	padding: 18px 20px;
 }
 
-.status {
-color: #5b6572;
-font-size: 13px;
+.section-title {
+	border-bottom: 2px solid #2563eb;
+	font-size: 16px;
+	letter-spacing: 1px;
+	margin: 0 0 14px;
+	padding-bottom: 6px;
+	text-transform: uppercase;
 }
 
-.roadmap {
-display: grid;
-gap: 8px;
-margin-top: 16px;
+.placeholder {
+	color: #5b6572;
+	font-size: 14px;
+	margin: 0;
 }
 
-.node {
-background: #fff;
-border: 1px solid #e1e7f0;
-border-radius: 8px;
-padding: 8px 12px;
+.card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
-.node-title {
-font-weight: bold;
-margin: 0;
+.resume-footer {
+	border-top: 1px solid #d7dee9;
+	padding: 18px;
+	text-align: center;
 }
 
-.node-status {
-color: #5b6572;
-font-size: 13px;
-margin: 4px 0 0;
+.footer-text {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 0;
+}
+
+@media (min-width: 640px) {
+	.resume-header {
+		align-items: flex-start;
+		padding: 44px 32px;
+		text-align: left;
+	}
+
+	.resume {
+		padding: 36px 32px;
+	}
 }`,
-		javascript: `// Skill Roadmap — Lesson 2: Add Nodes and Links
-const titleInput = document.getElementById("node-title");
-const addButton = document.getElementById("add-btn");
-const fromInput = document.getElementById("edge-from");
-const toInput = document.getElementById("edge-to");
-const addEdgeButton = document.getElementById("add-edge-btn");
-const roadmap = document.getElementById("roadmap");
-const status = document.getElementById("status");
-const nodes = [
-{ id: "html", title: "HTML Basics", status: "done", prerequisites: [] },
-{ id: "css", title: "CSS Basics", status: "in-progress", prerequisites: ["html"] },
-{ id: "js", title: "JS Basics", status: "todo", prerequisites: ["css"] }
-];
-function nodeById(id) {
-for (const node of nodes) {
-if (node.id === id) {
-return node;
-}
-}
-return undefined;
-}
-function slug(title) {
-return title.toLowerCase().trim().split(" ").join("-");
-}
-function render() {
-roadmap.innerHTML = "";
-for (const node of nodes) {
-const card = document.createElement("div");
-card.className = "node";
-const heading = document.createElement("p");
-heading.className = "node-title";
-heading.textContent = node.title;
-card.appendChild(heading);
-const state = document.createElement("p");
-state.className = "node-status";
-state.textContent = node.status + " · needs " + node.prerequisites.length;
-card.appendChild(state);
-roadmap.appendChild(card);
-}
-status.textContent = nodes.length + " skills on the map";
-console.log("Rendered " + nodes.length + " skills.");
-}
-function addNode() {
-const title = titleInput.value.trim();
-if (title === "") {
-console.log("A skill needs a title.");
-return;
-}
-const id = slug(title);
-if (nodeById(id) !== undefined) {
-console.log("That id is taken: " + id);
-return;
-}
-nodes.push({ id: id, title: title, status: "todo", prerequisites: [] });
-titleInput.value = "";
-render();
-}
-function addEdge() {
-const from = fromInput.value.trim();
-const to = toInput.value.trim();
-if (from === "" || to === "") {
-console.log("Both fields need an id.");
-} else if (from === to) {
-console.log("A skill cannot require itself.");
-} else if (nodeById(from) === undefined || nodeById(to) === undefined) {
-console.log("Unknown skill id.");
-} else if (nodeById(from).prerequisites.indexOf(to) !== -1) {
-console.log("That link already exists.");
-} else {
-nodeById(from).prerequisites.push(to);
-render();
-}
-}
-addButton.addEventListener("click", addNode);
-addEdgeButton.addEventListener("click", addEdge);
-render();`
+		javascript: `// Data-Driven Resume — Lesson 2: CSS and Flexbox Skin
+const header = document.querySelector(".resume-header");
+const resume = document.querySelector(".resume");
+const headerStyle = getComputedStyle(header);
+console.log("Header display: " + headerStyle.display);
+console.log("Header direction: " + headerStyle.flexDirection);
+console.log("Resume width: " + resume.offsetWidth + "px");
+console.log("Resize the preview: the skin adapts, the HTML does not.");
+`
 	}
 };
