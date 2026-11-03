@@ -6,7 +6,8 @@
 ## 1. Project overview
 
 Avencode is a 100%-interactive front-end course platform. The shipped course
-is Module 0 ("Skill Roadmap" prerequisite skill map, 17 lessons, 5 phases).
+has two modules: Module 1 ("Data-Driven Resume", 15 lessons, 5 phases) and
+Module 2 ("Skill Roadmap" prerequisite skill map, 17 lessons, 5 phases).
 
 Two code types — never confuse them:
 
@@ -31,7 +32,7 @@ Two code types — never confuse them:
 | ------------------------------------- | ------------------------------------------------------------------------------- |
 | `src/routes/`                         | `+page.svelte` (landing), `lesson/[id]/` (lab), `better-auth/`, `api/progress/` |
 | `src/lib/content/roadmap/lessons.js`  | Course index: metadata only (`id`, `title`, optional `type`)                    |
-| `src/lib/content/roadmap/curriculum/` | Full lesson bodies (`lesson-01.js`…`lesson-17.js`)                              |
+| `src/lib/content/roadmap/curriculum/` | Full lesson bodies (`lesson-01.js`…`lesson-32.js`)                              |
 | `src/lib/content/roadmap/engine.js`   | Tested reference for lesson logic (graph + signals); see §4                     |
 | `src/lib/playground/`                 | Sandboxed iframe preview (`buildSrcDoc.js`, `iframeProtocol.js`)                |
 | `src/lib/stores/`                     | `progress.svelte.js`, `progressMigrations.js`, `labLayout.js`                   |
@@ -47,7 +48,7 @@ All verified on Node v22 / pnpm 10 unless marked otherwise.
 
 ```sh
 pnpm install --frozen-lockfile --prefer-offline  # verified: OK (9s)
-node --test tests/*.test.js                      # verified: 42/42 pass
+node --test tests/*.test.js                      # verified: 57/57 pass
 pnpm exec prettier --check .                     # verified: FAILS (5 files, see §11)
 pnpm exec eslint .                               # verified: FAILS (10 errors, see §11)
 pnpm run build                                   # verified: PARTIAL — Vite SSR+client OK,
@@ -86,10 +87,10 @@ Notes:
   stack/from/to), `phases`, `lessonList`, and lazy `loadLesson(id)` importers.
   Each `curriculum/lesson-NN.js` default-exports `{ id, title, description,
 task, concept, whyItMatters, starterCode: { html, css, javascript },
-type? }`. `type: 'challenge'` marks lessons 9 (topological order) and 16
-  (diamond final boss); each challenge's prose must contain
-  "Integrative challenge". `tests/lessons.test.js` enforces this contract —
-  read it before adding or renumbering lessons.
+type? }`. `type: 'challenge'` marks lessons 13 (filter/search/restore), 24
+  (topological order) and 31 (diamond final boss); each challenge's prose must
+  contain "Integrative challenge". `tests/lessons.test.js` enforces this
+  contract — read it before adding or renumbering lessons.
 - **Lesson logic reference:** `src/lib/content/roadmap/engine.js` holds the
   canonical pure implementations of what learners build (derived status,
   depth, cycle DFS, topological order, progress math, signals/effects/memos,
@@ -98,7 +99,7 @@ type? }`. `type: 'challenge'` marks lessons 9 (topological order) and 16
   `static/projects/00-skill-roadmap/` (classic scripts, same format as the
   in-lesson starters).
 - **Progress model:** localStorage key `avencode-progress` (versioned,
-  currently v2) is the render source of truth: `{ currentLesson,
+  currently v3) is the render source of truth: `{ currentLesson,
 completedLessons[], editorContents{lessonId: {html,css,javascript}},
 updatedAt }`. Logged-in learners mirror it to the MongoDB `progress`
   collection keyed by `userId` (upsert, 400 KB cap). Every read/write passes

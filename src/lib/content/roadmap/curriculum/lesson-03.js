@@ -1,206 +1,134 @@
-// Skill Roadmap — Lesson 3: Derived Status with every and switch
+// Data-Driven Resume — Lesson 3: Variables and Data Types
 export default {
 	id: 3,
-	title: 'Derived Status with every and switch',
-	description: `Stored status is not the whole story: a \`todo\` skill whose prerequisites are all done is actually **ready**, and one with unfinished prerequisites is **blocked**. This lesson adds \`getStatus(node, nodes)\`, which derives the display status with \`every\` and picks the label with \`switch\`.\n\nThe render now shows derived truth: \`js\` is blocked while \`css\` is unfinished, and flips to ready the moment you mark \`css\` done (lesson 4 adds that button).`,
-	task: `1. Press Run and read each node's derived status.\n2. In the code, flip \`css\` to \`"done"\` and run again: watch \`js\` become ready without any other change.\n3. Add a node with two prerequisites and confirm it stays blocked until both are done.`,
-	concept: `**Derived state with every and switch** — \`every\` answers "are all prerequisites done?" in one line, and \`switch\` maps the stored status to its display twin. Nothing new is stored: the label is computed from data you already have, so it can never go stale.`,
-	whyItMatters: `Derived values are the cheapest correctness you can buy: compute instead of store, and a whole class of "forgot to update" bugs disappears.`,
+	title: 'Variables and Data Types',
+	description: `The page still shows placeholders, but the JavaScript tab now holds your first real data. You will store text, numbers and true/false values in variables, print them with \`console.log()\` and watch how \`const\` and \`let\` differ.\n\nThis is the "data first" rule of the module: before a single character reaches the page, the information must exist in JavaScript.`,
+	task: `1. Press Run and read every line in the console.\n2. Change \`name\`, \`role\` and \`email\` to your own details and run again.\n3. Change \`hourlyRate\` and \`hoursPerWeek\`, then predict \`weeklyTarget\` before running.\n4. Try uncommenting \`// name = "Someone else";\` and read the error in the console. Re-comment it before moving on.`,
+	concept: `**\`const\` binds, \`let\` rebinds** — a \`const\` variable cannot point at a different value, but the object it points at can still be mutated (lesson 4). \`let\` is for values that will be replaced, like a counter. Strings, numbers, booleans, \`null\` and \`undefined\` are the primitive types this project uses, and \`typeof\` tells you which one you have.`,
+	whyItMatters: `Nearly every bug starts with a value that is not what you think it is. Names, types and \`console.log()\` are the cheapest debugging tools you own, and they cost nothing to use from the first minute.`,
 	starterCode: {
 		html: `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Skill Roadmap — Lesson 3</title>
+<title>Data-Driven Resume — Lesson 3</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<main class="app">
-<h1 class="app-title">Skill Roadmap</h1>
-<div class="composer">
-<input id="node-title" class="node-input" placeholder="New skill title..." />
-<button id="add-btn" class="btn" type="button">Add Skill</button>
-</div>
-<div class="composer">
-<input id="edge-from" class="node-input" placeholder="Skill id..." />
-<input id="edge-to" class="node-input" placeholder="Requires skill id..." />
-<button id="add-edge-btn" class="btn" type="button">Add Prerequisite</button>
-</div>
-<p id="status" class="status"></p>
-<section id="roadmap" class="roadmap" aria-label="Roadmap"></section>
+<header class="resume-header">
+<h1 class="resume-name">Your Name</h1>
+<p class="resume-role">Frontend Developer</p>
+<p class="resume-contact">you@example.com · github.com/you</p>
+</header>
+<main class="resume">
+<section class="resume-section" aria-labelledby="about-title">
+<h2 id="about-title" class="section-title">About</h2>
+<p class="placeholder" data-empty="about">The profile data lives in app.js for now.</p>
+</section>
 </main>
+<footer class="resume-footer">
+<p class="footer-text">Built with HTML, CSS and JavaScript.</p>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>`,
 		css: `body {
-background: #f4f6fb;
-color: #1c2430;
-font-family: system-ui, sans-serif;
-margin: 0;
+	background: #f4f6fb;
+	color: #1c2430;
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+	margin: 0;
 }
 
-.app {
-margin: 32px auto;
-max-width: 640px;
-padding: 0 16px;
+.resume-header {
+	background: #101828;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 36px 20px;
+	text-align: center;
 }
 
-.app-title {
-font-size: 28px;
-margin: 0 0 8px;
+.resume-name {
+	font-size: 32px;
+	margin: 0;
 }
 
-.composer {
-display: flex;
-gap: 8px;
-align-items: flex-start;
-margin-top: 8px;
+.resume-role {
+	color: #7dd3fc;
+	font-weight: 600;
+	margin: 0;
 }
 
-.node-input {
-flex: 1;
-border: 1px solid #c7d0dd;
-border-radius: 8px;
-font: inherit;
-padding: 8px 12px;
+.resume-contact {
+	color: #94a3b8;
+	font-size: 13px;
+	margin: 0;
 }
 
-.btn {
-background: #2563eb;
-border: none;
-border-radius: 8px;
-color: #fff;
-cursor: pointer;
-font: inherit;
-padding: 10px 16px;
+.resume {
+	margin: 0 auto;
+	max-width: 720px;
+	padding: 28px 20px;
 }
 
-.btn:hover {
-background: #1d4ed8;
+.resume-section {
+	background: #fff;
+	border: 1px solid #e1e7f0;
+	border-radius: 12px;
+	padding: 18px 20px;
 }
 
-.status {
-color: #5b6572;
-font-size: 13px;
+.section-title {
+	border-bottom: 2px solid #2563eb;
+	font-size: 16px;
+	letter-spacing: 1px;
+	margin: 0 0 14px;
+	padding-bottom: 6px;
+	text-transform: uppercase;
 }
 
-.roadmap {
-display: grid;
-gap: 8px;
-margin-top: 16px;
+.placeholder {
+	color: #5b6572;
+	font-size: 14px;
+	margin: 0;
 }
 
-.node {
-background: #fff;
-border: 1px solid #e1e7f0;
-border-radius: 8px;
-padding: 8px 12px;
+.resume-footer {
+	border-top: 1px solid #d7dee9;
+	padding: 18px;
+	text-align: center;
 }
 
-.node-title {
-font-weight: bold;
-margin: 0;
-}
-
-.node-status {
-color: #5b6572;
-font-size: 13px;
-margin: 4px 0 0;
+.footer-text {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 0;
 }`,
-		javascript: `// Skill Roadmap — Lesson 3: Derived Status with every and switch
-const titleInput = document.getElementById("node-title");
-const addButton = document.getElementById("add-btn");
-const fromInput = document.getElementById("edge-from");
-const toInput = document.getElementById("edge-to");
-const addEdgeButton = document.getElementById("add-edge-btn");
-const roadmap = document.getElementById("roadmap");
-const status = document.getElementById("status");
-const nodes = [
-{ id: "html", title: "HTML Basics", status: "done", prerequisites: [] },
-{ id: "css", title: "CSS Basics", status: "in-progress", prerequisites: ["html"] },
-{ id: "js", title: "JS Basics", status: "todo", prerequisites: ["css"] }
-];
-function nodeById(id) {
-for (const node of nodes) {
-if (node.id === id) {
-return node;
-}
-}
-return undefined;
-}
-function getStatus(node) {
-switch (node.status) {
-case "done":
-return "done";
-case "in-progress":
-return "in progress";
-default: {
-const allDone = node.prerequisites.every(function (id) {
-return nodeById(id) !== undefined && nodeById(id).status === "done";
-});
-switch (allDone) {
-case true:
-return "ready";
-default:
-return "blocked";
-}
-}
-}
-}
-function slug(title) {
-return title.toLowerCase().trim().split(" ").join("-");
-}
-function render() {
-roadmap.innerHTML = "";
-for (const node of nodes) {
-const card = document.createElement("div");
-card.className = "node";
-const heading = document.createElement("p");
-heading.className = "node-title";
-heading.textContent = node.title;
-card.appendChild(heading);
-const state = document.createElement("p");
-state.className = "node-status";
-state.textContent = getStatus(node) + " (stored: " + node.status + ")";
-card.appendChild(state);
-roadmap.appendChild(card);
-}
-status.textContent = nodes.length + " skills on the map";
-console.log("Rendered " + nodes.length + " skills.");
-}
-function addNode() {
-const title = titleInput.value.trim();
-if (title === "") {
-console.log("A skill needs a title.");
-return;
-}
-const id = slug(title);
-if (nodeById(id) !== undefined) {
-console.log("That id is taken: " + id);
-return;
-}
-nodes.push({ id: id, title: title, status: "todo", prerequisites: [] });
-titleInput.value = "";
-render();
-}
-function addEdge() {
-const from = fromInput.value.trim();
-const to = toInput.value.trim();
-if (from === "" || to === "") {
-console.log("Both fields need an id.");
-} else if (from === to) {
-console.log("A skill cannot require itself.");
-} else if (nodeById(from) === undefined || nodeById(to) === undefined) {
-console.log("Unknown skill id.");
-} else if (nodeById(from).prerequisites.indexOf(to) !== -1) {
-console.log("That link already exists.");
-} else {
-nodeById(from).prerequisites.push(to);
-render();
-}
-}
-addButton.addEventListener("click", addNode);
-addEdgeButton.addEventListener("click", addEdge);
-render();`
+		javascript: `// Data-Driven Resume — Lesson 3: Variables and Data Types
+const name = "Diego";
+const role = "Frontend Developer";
+const email = "diego@example.com";
+const yearsOfExperience = 3;
+const openToWork = true;
+const hourlyRate = 25;
+const hoursPerWeek = 20;
+
+let profileViews = 0;
+profileViews = profileViews + 1;
+
+const weeklyTarget = hourlyRate * hoursPerWeek;
+
+console.log(name + " — " + role);
+console.log("Email: " + email + " (" + typeof email + ")");
+console.log("Years of experience: " + yearsOfExperience + " (" + typeof yearsOfExperience + ")");
+console.log("Open to work: " + openToWork + " (" + typeof openToWork + ")");
+console.log("Profile views: " + profileViews);
+console.log("Weekly target: " + weeklyTarget);
+
+// const prevents rebinding: uncomment to see the error.
+// name = "Someone else";
+`
 	}
 };

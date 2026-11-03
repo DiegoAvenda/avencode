@@ -13,7 +13,11 @@
  *   on the server mirror) migrate to fresh defaults: the old progress is
  *   archived by reset. Nothing is deleted from MongoDB; stale documents are
  *   overwritten on the owner's next PUT, and reads never surface stale ids.
- * - v2: Module 0 is "Skill Roadmap" (17 lessons).
+ * - v2: Module 0 was "Skill Roadmap" (17 lessons). Kept as a readable era:
+ *   its ids move to the end of the curriculum when Module 1 ("Hello, Logic",
+ *   15 lessons) is inserted in front, so learner work is preserved.
+ * - v3: Module 1 is "Hello, Logic" (lessons 1-15) and Module 2 is
+ *   "Skill Roadmap" (lessons 16-32).
  *
  * If lessons are ever renumbered, inserted or moved: add a
  * `shiftProgressToVN` function below, chain it in `migrateToCurrent`, and
@@ -25,12 +29,17 @@
  */
 
 export const STORAGE_KEY = 'avencode-progress';
-export const STORAGE_VERSION = 2;
+export const STORAGE_VERSION = 3;
 
-/** Highest lesson id of Module 0. Importing lessons.js here would pull the
- * whole curriculum into server bundles, so the bound is duplicated and
- * asserted by `tests/progress.test.js`. */
-export const MAX_LESSON_ID = 17;
+/** Highest lesson id of the shipped curriculum. Importing lessons.js here
+ * would pull the whole curriculum into server bundles, so the bound is
+ * duplicated and asserted by `tests/progress.test.js`. */
+export const MAX_LESSON_ID = 32;
+
+/** Highest lesson id of the v2 curriculum (Skill Roadmap alone), and how far
+ * those ids move when Hello, Logic is inserted in front of it. */
+const V2_MAX_LESSON_ID = 17;
+const V2_TO_V3_SHIFT = 15;
 
 /**
  * Remap every lesson reference inside a progress payload.
@@ -132,6 +141,15 @@ export function migrateToCurrent(raw) {
 		// editor snapshots reference a deleted curriculum, so the readable
 		// move is a reset, not a remap.
 		return sanitizeProgress(null);
+	}
+	if (parsed.version === 2) {
+		// Module 1 was inserted in front of the Skill Roadmap module, so every
+		// v2 id moves by the size of the new module. Ids outside the v2 range
+		// become 0 and are dropped by sanitizeProgress.
+		const shifted = mapProgress(parsed, (id) =>
+			id >= 1 && id <= V2_MAX_LESSON_ID ? id + V2_TO_V3_SHIFT : 0
+		);
+		return sanitizeProgress(shifted);
 	}
 	// Unknown future version: keep whatever is still readable.
 	return sanitizeProgress(parsed);

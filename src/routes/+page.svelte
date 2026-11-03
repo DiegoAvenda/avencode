@@ -5,7 +5,6 @@
 	import { createProgressStore } from '#lib/stores/progress.svelte.js';
 
 	const progress = createProgressStore();
-	const course = modules[0];
 
 	let ready = $state(false);
 	onMount(() => {
@@ -25,13 +24,7 @@
 	const progressPercent = $derived(Math.round((completedTotal / lessonList.length) * 100));
 	const callToAction = $derived(started ? `Continue: Lesson ${currentLesson}` : 'Start Lesson 1');
 
-	const total = $derived(course.to - course.from + 1);
-	const doneCount = $derived(
-		ready
-			? progress.completedLessons.filter((id) => id >= course.from && id <= course.to).length
-			: 0
-	);
-	const percent = $derived(Math.round((doneCount / total) * 100));
+	const total = $derived(lessonList.length);
 
 	/** @param {number} id */
 	function isChallenge(id) {

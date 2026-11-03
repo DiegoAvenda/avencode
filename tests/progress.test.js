@@ -10,8 +10,8 @@ import {
 } from '../src/lib/stores/progressMigrations.js';
 import { lessonList } from '../src/lib/content/roadmap/lessons.js';
 
-test('the storage version is 2 for the Skill Roadmap curriculum', () => {
-	assert.equal(STORAGE_VERSION, 2);
+test('the storage version is 3 for the two-module curriculum', () => {
+	assert.equal(STORAGE_VERSION, 3);
 });
 
 test('the lesson bound matches the shipped curriculum', () => {
@@ -114,14 +114,44 @@ test('previous-curriculum payloads (v1 or version-less) reset to fresh defaults'
 	assert.deepEqual(migrateToCurrent(fresh), fresh, 'migration is idempotent');
 });
 
+test('v2 lesson ids shift when Module 1 is inserted in front', () => {
+	const migrated = migrateToCurrent({
+		version: 2,
+		currentLesson: 17,
+		completedLessons: [1, 17],
+		editorContents: {
+			1: { html: 'a', css: 'b', javascript: 'c' },
+			17: { html: 'd', css: 'e', javascript: 'f' }
+		}
+	});
+
+	assert.equal(migrated.currentLesson, 32);
+	assert.deepEqual(migrated.completedLessons, [16, 32]);
+	assert.deepEqual(Object.keys(migrated.editorContents).sort(), ['16', '32']);
+});
+
+test('v2 ids outside the old range never become valid lessons by shifting', () => {
+	const migrated = migrateToCurrent({
+		version: 2,
+		currentLesson: 99,
+		completedLessons: [0, 18, 99],
+		editorContents: { 18: { html: 'a', css: 'b', javascript: 'c' } }
+	});
+
+	assert.equal(migrated.currentLesson, 1);
+	assert.deepEqual(migrated.completedLessons, []);
+	assert.deepEqual(migrated.editorContents, {});
+});
+
 test('a current-version payload round-trips through the migration', () => {
-	assert.deepEqual(
-		migrateToCurrent({
-			version: 2,
-			currentLesson: 11,
-			completedLessons: [10],
-			editorContents: {}
-		}),
-		{ currentLesson: 11, completedLessons: [10], editorContents: {} }
-	);
+	const payload = {
+		version: 3,
+		currentLesson: 26,
+		completedLessons: [15, 25],
+		editorContents: {}
+	};
+	const migrated = migrateToCurrent(payload);
+
+	assert.deepEqual(migrated, { currentLesson: 26, completedLessons: [15, 25], editorContents: {} });
+	assert.deepEqual(migrateToCurrent({ ...payload, ...migrated }), migrated);
 });

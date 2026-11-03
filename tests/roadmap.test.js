@@ -140,8 +140,8 @@ test('KNOWN LIMITATION: in a diamond the effect runs twice and sees mixed state'
 	// Diamond: source S feeds branches A and B, which converge on effect C.
 	// This engine notifies depth-first with no topological ordering, so when
 	// S changes, A recomputes and wakes C before B has recomputed: C first
-	// observes (new A, stale B), then (new A, new B). Lesson 16 teaches this
-	// as the documented limitation; Module 1 fixes it with ordered recalc.
+	// observes (new A, stale B), then (new A, new B). Lesson 31 teaches this
+	// as the documented limitation; a later module fixes it with ordered recalc.
 	const source = createSignal(1);
 	const left = createMemo(() => source.get() * 10);
 	const right = createMemo(() => source.get() * 100);

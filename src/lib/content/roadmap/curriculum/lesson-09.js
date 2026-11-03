@@ -1,229 +1,200 @@
-// Skill Roadmap — Lesson 9: Suggested Order to a Goal
+// Data-Driven Resume — Lesson 9: Loops That Render
 export default {
 	id: 9,
-	title: 'Suggested Order to a Goal',
-	type: 'challenge',
-	description: `**Integrative challenge (advanced and optional).** "What can I start today?" is answered; "in what order do I reach Events?" is not. The answer is a topological order: prerequisites first, goal last, found with a depth-first walk that pushes each node after its prerequisites.\n\n**The 80/20:** 80% is the app you just built (graph, guards, persistence). The new 20% is one small function with a fixed signature:\n\n\`\`\`\nsuggestedOrder(goalId)  // ids from first prerequisite to the goal itself\n\`\`\`\n\nPress **Run the checks**: four fixed cases grade your function (ends at the goal, prerequisites before dependents, single node, and unknown goal). When all four pass, a card reveals your next two practice builds.\n\n**Your next two builds after this module.**\n\n- Highlight the suggested path inside the layered view.\n- Skip done skills in the suggestion unless the goal itself is done.`,
-	task: `1. Read \`suggestedOrder\`: it is the only TODO.\n2. Implement the walk: visit the goal, recurse into each prerequisite first, push the node after its prerequisites, skip visited ids.\n3. Type a goal id, press Show path, then press **Run the checks**. When all four pass, read your card — then solve both follow-up builds.`,
-	concept: `**Topological order via post-order DFS** — push a node only after everything it needs is already pushed, and the list comes out executable: learn this, then this, then the goal. Visited ids keep shared ancestors (like \`html\`) listed once. It is the same DFS shape as cycle detection, pointed at a different question.`,
-	whyItMatters: `Schedulers, installers and course unlocks all answer "in what order?" with topological sorts. It is the algorithm that turns a graph into a plan — and the last manual tool before Part B automates the views.`,
+	title: 'Loops That Render',
+	description: `One template for every card, one loop for every job. This lesson replaces the copy-paste from lesson 8 with a \`for...of\` loop that accumulates HTML into a string, then assigns it once.\n\nYou will also meet the classic \`for\` loop with an index — useful when you need the position of each job — and see why the two loops have different jobs even though both visit the same array.`,
+	task: `1. Press Run: all jobs render from a single template.\n2. Add a third job to \`experience\` and confirm it appears without touching the rendering code.\n3. Extend the numeric \`for\` loop to print the company and the number of years for each job.\n4. Add the number of jobs to \`#status\` using \`experience.length\`.`,
+	concept: `**Loop once, render all** — \`html += template\` grows a string, and the browser parses it once at the end. Use \`for...of\` when you need each item; use \`for (let index = 0; ...)\` when you need its position. Keep the loop's only job as "turn data into markup"; mixing in unrelated side effects makes it hard to reuse.`,
+	whyItMatters: `This is the moment a resume stops being a page and becomes an application: content comes from data, and adding a job is a one-line data edit. Every list you have ever scrolled — feeds, search results, inboxes — is this exact pattern at a larger scale.`,
 	starterCode: {
 		html: `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Skill Roadmap — Lesson 9</title>
+<title>Data-Driven Resume — Lesson 9</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<main class="app">
-<h1 class="app-title">Skill Roadmap</h1>
-<div class="composer">
-<input id="goal-id" class="node-input" placeholder="Goal skill id..." />
-<button id="show-path-btn" class="btn" type="button">Show path</button>
-<button id="run-checks" class="btn" type="button">Run the checks</button>
-</div>
-<ol id="path-list" class="path-list"></ol>
-<pre id="report" class="report">Press Run the checks.</pre>
-<section id="card" class="card" hidden>
-<h2 class="card-title">Challenge cleared</h2>
-<p class="card-text">Next: 1) Highlight the suggested path inside the layered view. 2) Skip done skills in the suggestion unless the goal itself is done.</p>
+<header class="resume-header">
+<h1 id="profile-name" class="resume-name"></h1>
+<p id="profile-role" class="resume-role"></p>
+<p class="resume-contact"><span id="profile-email"></span></p>
+</header>
+<main class="resume">
+<section class="resume-section" aria-labelledby="experience-title">
+<h2 id="experience-title" class="section-title">Experience</h2>
+<div id="experience-list" class="card-list"></div>
 </section>
-<section id="roadmap" class="roadmap" aria-label="Roadmap"></section>
+<p id="status" class="status" aria-live="polite"></p>
 </main>
+<footer class="resume-footer">
+<p class="footer-text">Built with HTML, CSS and JavaScript.</p>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>`,
 		css: `body {
-background: #f4f6fb;
-color: #1c2430;
-font-family: system-ui, sans-serif;
-margin: 0;
+	background: #f4f6fb;
+	color: #1c2430;
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+	margin: 0;
 }
 
-.app {
-margin: 32px auto;
-max-width: 640px;
-padding: 0 16px;
+.resume-header {
+	background: #101828;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 36px 20px;
+	text-align: center;
 }
 
-.app-title {
-font-size: 28px;
-margin: 0 0 8px;
+.resume-name {
+	font-size: 32px;
+	margin: 0;
 }
 
-.composer {
-display: flex;
-gap: 8px;
-align-items: flex-start;
-margin-top: 8px;
+.resume-role {
+	color: #7dd3fc;
+	font-weight: 600;
+	margin: 0;
 }
 
-.node-input {
-flex: 1;
-border: 1px solid #c7d0dd;
-border-radius: 8px;
-font: inherit;
-padding: 8px 12px;
+.resume-contact {
+	color: #94a3b8;
+	font-size: 13px;
+	margin: 0;
 }
 
-.btn {
-background: #2563eb;
-border: none;
-border-radius: 8px;
-color: #fff;
-cursor: pointer;
-font: inherit;
-padding: 10px 16px;
+.resume {
+	margin: 0 auto;
+	max-width: 720px;
+	padding: 28px 20px;
 }
 
-.btn:hover {
-background: #1d4ed8;
+.resume-section {
+	background: #fff;
+	border: 1px solid #e1e7f0;
+	border-radius: 12px;
+	padding: 18px 20px;
 }
 
-.roadmap {
-display: grid;
-gap: 8px;
-margin-top: 16px;
+.section-title {
+	border-bottom: 2px solid #2563eb;
+	font-size: 16px;
+	letter-spacing: 1px;
+	margin: 0 0 14px;
+	padding-bottom: 6px;
+	text-transform: uppercase;
 }
 
-.node {
-background: #fff;
-border: 1px solid #e1e7f0;
-border-radius: 8px;
-padding: 8px 12px;
-}
-
-.node-title {
-font-weight: bold;
-margin: 0;
-}
-
-.path-list {
-display: grid;
-gap: 8px;
-margin: 16px 0 0;
-padding: 0;
-list-style: decimal inside;
-}
-
-.path-item {
-background: #fff;
-border: 1px solid #e1e7f0;
-border-radius: 8px;
-padding: 8px 12px;
-}
-
-.report {
-background: #101828;
-border-radius: 8px;
-color: #d1fadf;
-font-family: ui-monospace, monospace;
-font-size: 13px;
-margin-top: 16px;
-overflow-x: auto;
-padding: 12px 16px;
+.card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
 .card {
-background: #ecfdf3;
-border: 1px solid #12b76a;
-border-radius: 8px;
-margin-top: 16px;
-padding: 12px 16px;
+	background: #fbfcfe;
+	border: 1px solid #e1e7f0;
+	border-radius: 10px;
+	padding: 14px 16px;
 }
 
 .card-title {
-font-size: 18px;
-margin: 0 0 4px;
+	font-size: 16px;
+	margin: 0;
 }
 
-.card-text {
-margin: 0;
+.card-subtitle {
+	color: #2563eb;
+	font-weight: 600;
+	margin: 2px 0 0;
+}
+
+.card-meta {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 6px 0 0;
+}
+
+.status {
+	color: #5b6572;
+	font-size: 13px;
+	margin: 14px 0 0;
+}
+
+.resume-footer {
+	border-top: 1px solid #d7dee9;
+	padding: 18px;
+	text-align: center;
+}
+
+.footer-text {
+	color: #5b6572;
+	font-size: 12px;
+	margin: 0;
 }`,
-		javascript: `// Skill Roadmap — Lesson 9: Suggested Order to a Goal
-const goalInput = document.getElementById("goal-id");
-const showPathButton = document.getElementById("show-path-btn");
-const runChecksButton = document.getElementById("run-checks");
-const pathList = document.getElementById("path-list");
-const report = document.getElementById("report");
-const card = document.getElementById("card");
-const roadmap = document.getElementById("roadmap");
-const nodes = [
-{ id: "html", title: "HTML Basics", status: "done", prerequisites: [], branch: "Markup" },
-{ id: "css", title: "CSS Basics", status: "in-progress", prerequisites: ["html"], branch: "Styling" },
-{ id: "js", title: "JS Basics", status: "todo", prerequisites: ["css"], branch: "Scripting" },
-{ id: "dom", title: "DOM Intro", status: "todo", prerequisites: ["html", "js"], branch: "Scripting" },
-{ id: "events", title: "Events", status: "todo", prerequisites: ["dom"], branch: "Scripting" }
+		javascript: `// Data-Driven Resume — Lesson 9: Loops That Render
+const profile = {
+	name: "Diego",
+	role: "Frontend Developer",
+	email: "diego@example.com"
+};
+
+const experience = [
+	{
+		company: "Teleperformance",
+		position: "Subject Matter Expert",
+		start: 2023,
+		end: 2026,
+		skills: ["training", "quality"]
+	},
+	{
+		company: "Villa la Valencia",
+		position: "Front Desk Agent",
+		start: 2022,
+		end: 2023,
+		skills: ["customer service", "english"]
+	},
+	{
+		company: "Freelance",
+		position: "Frontend Developer",
+		start: 2024,
+		end: 2026,
+		skills: ["html", "css", "javascript"]
+	}
 ];
-function nodeById(id) {
-for (const node of nodes) {
-if (node.id === id) {
-return node;
+
+document.getElementById("profile-name").textContent = profile.name;
+document.getElementById("profile-role").textContent = profile.role;
+document.getElementById("profile-email").textContent = profile.email;
+
+console.log("Jobs with their index:");
+for (let index = 0; index < experience.length; index++) {
+	console.log(index + ": " + experience[index].company);
 }
+
+let html = "";
+for (const job of experience) {
+	html += \`
+<article class="card">
+<h3 class="card-title">\${job.position}</h3>
+<p class="card-subtitle">\${job.company}</p>
+<p class="card-meta">\${job.start} — \${job.end}</p>
+</article>
+\`;
 }
-return undefined;
-}
-function suggestedOrder(goalId) {
-// YOUR CODE HERE: DFS post-order from goalId over prerequisites.
-// Push each node after its prerequisites; skip visited ids.
-return [];
-}
-function renderRoadmap() {
-roadmap.innerHTML = "";
-for (const node of nodes) {
-const item = document.createElement("div");
-item.className = "node";
-const heading = document.createElement("p");
-heading.className = "node-title";
-heading.textContent = node.title + " (" + node.id + ")";
-item.appendChild(heading);
-roadmap.appendChild(item);
-}
-}
-function showPath() {
-const goalId = goalInput.value.trim();
-if (goalId === "") {
-console.log("Type a goal id first.");
-return;
-}
-pathList.innerHTML = "";
-const order = suggestedOrder(goalId);
-for (const id of order) {
-const item = document.createElement("li");
-item.className = "path-item";
-const node = nodeById(id);
-item.textContent = node === undefined ? id : node.title;
-pathList.appendChild(item);
-}
-console.log("Path to " + goalId + ": " + order.join(" -> "));
-}
-function check(name, actual, expected) {
-const pass = JSON.stringify(actual) === JSON.stringify(expected);
-console.log((pass ? "PASS" : "FAIL") + " " + name);
-return { name: name, pass: pass };
-}
-function runAllChecks() {
-const toEvents = suggestedOrder("events");
-const results = [
-check("path ends at the goal", toEvents[toEvents.length - 1], "events"),
-check("prerequisites come before dependents", toEvents.indexOf("dom") < toEvents.indexOf("events") && toEvents.indexOf("js") < toEvents.indexOf("dom"), true),
-check("single node suggests itself", suggestedOrder("html"), ["html"]),
-check("unknown goal returns itself", suggestedOrder("ghost"), ["ghost"])
-];
-const passed = results.filter(function (entry) {
-return entry.pass;
-}).length;
-const lines = results.map(function (entry) {
-return (entry.pass ? "PASS" : "FAIL") + " " + entry.name;
-});
-report.textContent = lines.join("\\n") + "\\n" + passed + " of " + results.length + " checks pass.";
-if (passed === results.length) {
-card.hidden = false;
-}
-}
-showPathButton.addEventListener("click", showPath);
-runChecksButton.addEventListener("click", runAllChecks);
-renderRoadmap();`
+
+const list = document.getElementById("experience-list");
+list.innerHTML = html;
+
+document.getElementById("status").textContent =
+	experience.length + " jobs rendered from data. Add a job, change nothing else.";
+
+console.log("Cards rendered: " + list.children.length);
+`
 	}
 };
